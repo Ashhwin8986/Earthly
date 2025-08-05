@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -9,11 +9,32 @@ import ProfileDrawer from "@/components/ProfileDrawer";
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isProfileDrawerOpen, setIsProfileDrawerOpen] = useState(false);
+  const [isPastHero, setIsPastHero] = useState(false);
   const location = useLocation();
   const { user, loading } = useAuth();
 
   // Transparent navbar for landing page and EcoHub page
   const isLandingPage = location.pathname === "/" || location.pathname === "/ecohub";
+
+  useEffect(() => {
+    if (!isLandingPage) {
+      setIsPastHero(true);
+      return;
+    }
+
+    const heroSection = document.getElementById('hero-section');
+    if (!heroSection) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsPastHero(!entry.isIntersecting);
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(heroSection);
+    return () => observer.disconnect();
+  }, [isLandingPage]);
 
   const navItems = [
     { name: "My Dashboard", path: "/dashboard" },
@@ -35,10 +56,12 @@ const Navbar = () => {
     <>
       <nav
         className={cn(
-          "fixed top-0 left-0 right-0 z-50",
+          "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
           isLandingPage
-            ? "bg-transparent border-transparent"
-            : "backdrop-blur-lg bg-background/5 border-b border-border/20"
+            ? isPastHero
+              ? "bg-background border-b border-border/20"
+              : "bg-transparent border-none"
+            : "bg-background border-b border-border/20"
         )}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -55,16 +78,24 @@ const Navbar = () => {
               <div>
                 <h1
                   className={cn(
-                    "text-xl font-bold manrope-heading",
-                    isLandingPage ? "text-white" : "text-foreground"
+                    "text-xl font-bold manrope-heading transition-colors duration-300",
+                    isLandingPage
+                      ? isPastHero
+                        ? "text-green-600"
+                        : "text-white"
+                      : "text-foreground"
                   )}
                 >
                   Earthly
                 </h1>
                 <p
                   className={cn(
-                    "text-xs hidden sm:block newsreader-subheading",
-                    isLandingPage ? "text-white/80" : "text-muted-foreground"
+                    "text-xs hidden sm:block newsreader-subheading transition-colors duration-300",
+                    isLandingPage
+                      ? isPastHero
+                        ? "text-muted-foreground"
+                        : "text-white/80"
+                      : "text-muted-foreground"
                   )}
                 >
                   Tracking Nature's Pulse
@@ -99,7 +130,10 @@ const Navbar = () => {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="relative h-10 w-10 rounded-full p-0 hover:bg-secondary"
+                    className={cn(
+                      "relative h-10 w-10 rounded-full p-0 hover:bg-secondary transition-colors duration-300",
+                      isLandingPage && !isPastHero ? "text-white" : ""
+                    )}
                     onClick={() => setIsProfileDrawerOpen(true)}
                   >
                     <div className="h-9 w-9 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-medium">
@@ -127,8 +161,8 @@ const Navbar = () => {
               variant="ghost"
               size="sm"
               className={cn(
-                "md:hidden hover-scale",
-                isLandingPage ? "text-white hover:bg-white/10" : ""
+                "md:hidden hover-scale transition-colors duration-300",
+                isLandingPage && !isPastHero ? "text-white hover:bg-white/10" : ""
               )}
               onClick={() => setIsOpen(!isOpen)}
             >
@@ -144,7 +178,7 @@ const Navbar = () => {
               "md:hidden border-t slide-in-from-bottom",
               isLandingPage
                 ? "border-transparent bg-transparent"
-                : "backdrop-blur-lg border-border/30 bg-background/90"
+                : "bg-background border-border/30"
             )}
           >
             <div className="px-4 py-4 space-y-2">
