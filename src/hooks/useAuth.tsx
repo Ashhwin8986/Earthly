@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -16,9 +15,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
+  if (!context) throw new Error('useAuth must be used within an AuthProvider');
   return context;
 };
 
@@ -32,16 +29,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
-      }
-    );
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
 
-    // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
@@ -52,70 +45,66 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
     return { error };
   };
 
   const signUp = async (email: string, password: string, confirmPassword: string, username: string) => {
-    // Validate all fields are required
     if (!email || !password || !confirmPassword || !username) {
       return { error: { message: 'All fields are required' } };
     }
 
-    // Validate passwords match
     if (password !== confirmPassword) {
       return { error: { message: 'Passwords do not match' } };
     }
 
-    // Check if username already exists
-    const { data: existingProfile } = await supabase
+    // ✅ Check username existence safely
+    const { data: existingProfile, error: profileError } = await supabase
       .from('profiles')
       .select('username')
       .eq('username', username)
-      .single();
+      .maybeSingle();
+
+    if (profileError && profileError.code !== 'PGRST116') { // Ignore "no rows" error
+      console.error('Profile check failed:', profileError);
+      return { error: { message: 'Failed to check username availability' } };
+    }
 
     if (existingProfile) {
       return { error: { message: 'Username already exists' } };
     }
 
     const redirectUrl = `${window.location.origin}/`;
-    
-    // Sign up the user
+
+    // ✅ Create the user in Supabase Auth
     const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
       options: {
         emailRedirectTo: redirectUrl,
-        data: {
-          username: username,
-        },
+        data: { username },
       },
     });
 
     if (signUpError) {
+      console.error('Signup failed:', signUpError);
       return { error: signUpError };
     }
 
-    // If signup was successful and we have a user, insert profile data
+    // ✅ Insert into profiles table after successful signup
     if (signUpData?.user) {
-      const uid = signUpData.user.id;
-      
       const { error: insertError } = await supabase.from('profiles').insert({
-        id: uid,
-        username: username,
-        email: email,
+        id: signUpData.user.id,
+        username,
+        email,
         bio: null,
         avatar_url: null,
         created_at: new Date().toISOString(),
-        // updated_at is now handled automatically by the database trigger
       });
 
       if (insertError) {
         console.error('Profile insert failed:', insertError);
-        // Still return success if auth worked, as trigger might have handled it
+        // Still return success; auth worked, profile insert can be retried or handled by trigger
       }
     }
 
@@ -126,14 +115,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     await supabase.auth.signOut();
   };
 
-  const value = {
-    user,
-    session,
-    loading,
-    signIn,
-    signUp,
-    signOut,
-  };
-
+  const value = { user, session, loading, signIn, signUp, signOut };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

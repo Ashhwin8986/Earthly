@@ -1,14 +1,21 @@
-
-import { ArrowRight, Leaf, Globe, BarChart3, Shield } from "lucide-react";
+import { useEffect } from "react";
+import { ArrowRight, Leaf, Globe, BarChart3, Shield, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { ParticleButton } from "@/components/ui/particle-button";
 import heroImage from "@/assets/hero-earth.jpg";
+import ChatBot from "@/components/ChatBot";
 
 const EcoHub = () => {
-  // Mock authentication state - in a real app, this would come from your auth provider
-  const isSignedIn = false; // Change this based on actual auth state
+  const isSignedIn = false;
+
+  const handleTalkToSprout = () => {
+    const chatIconButton = document.querySelector<HTMLButtonElement>(
+      'button[class*="fixed"][class*="bottom-6"][class*="right-6"]'
+    );
+    chatIconButton?.click(); // Simulate click on the chatbot's floating button
+  };
 
   const features = [
     {
@@ -66,10 +73,13 @@ const EcoHub = () => {
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
+
+            {/* Talk to Sprout opens ChatBot via icon click */}
             <Button 
               size="lg" 
               variant="outline"
-              className="border-white/60 text-white bg-transparent hover:bg-transparent backdrop-blur-sm hover:shadow-lg hover:shadow-white/10 hover:border-white/80"
+              className="border-white/60 text-white bg-transparent hover:bg-transparent backdrop-blur-sm hover:shadow-lg hover:shadow-white/10 hover:border-white/80" 
+              onClick={handleTalkToSprout}
             >
               Talk To Sprout
             </Button>
@@ -124,6 +134,9 @@ const EcoHub = () => {
           </div>
         </div>
       </section>
+
+      {/* Mount ChatBot (this keeps it on the screen) */}
+      <ChatBot />
     </div>
   );
 };
