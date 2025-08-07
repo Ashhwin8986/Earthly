@@ -64,7 +64,7 @@ const EcoHub = () => {
             real-time environmental insights.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center fade-in stagger-2">
-            <Link to={isSignedIn ? "/dashboard" : "/signup"}>
+            <Link to={isSignedIn ? "/dashboard" : "/dashboard"}>
               <Button 
                 size="lg" 
                 className="bg-white text-primary hover:bg-white/90 hover-scale"
