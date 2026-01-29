@@ -15,6 +15,7 @@ import CropDetails from "./pages/CropDetails";
 import PlantCare from "./pages/PlantCare";
 import TrashScan from "./pages/TrashScan";
 import EarthFeed from "./pages/EarthFeed";
+import FarmGuide from "./pages/FarmGuide";
 import Dashboard from "./pages/Dashboard";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
@@ -39,6 +40,7 @@ const App = () => (
               <Route path="plantcare" element={<PlantCare />} />
               <Route path="trashscan" element={<TrashScan />} />
               <Route path="earthfeed" element={<EarthFeed />} />
+              <Route path="farmguide" element={<FarmGuide />} />
               <Route path="dashboard" element={
                 <ProtectedRoute>
                   <Dashboard />
