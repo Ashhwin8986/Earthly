@@ -43,6 +43,7 @@ const Navbar = () => {
     { name: "Grow Guide", path: "/growguide" },
     { name: "Plant Care", path: "/plantcare" },
     { name: "Trash Scan", path: "/trashscan" },
+    { name: "FarmGuide", path: "/farmguide" },
     { name: "Earth Feed", path: "/earthfeed" },
   ];
 
@@ -106,7 +107,7 @@ const Navbar = () => {
             {/* Desktop Navigation */}
             {!isLandingPage && (
               <div className="hidden md:flex items-center space-x-1">
-                {navItems.slice(0, 6).map((item) => (
+                {navItems.map((item) => (
                   <Link
                     key={item.name}
                     to={item.path}
