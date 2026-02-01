@@ -38,6 +38,7 @@ const FarmGuide = () => {
   const [uploadedImage, setUploadedImage] = useState<string | null>(null); // FIXED: Added type
   const [showYieldCalculator, setShowYieldCalculator] = useState(false);
   const [yieldResult, setYieldResult] = useState<YieldResult | null>(null); // FIXED: Added type
+  const [unit, setUnit] = useState("meters"); // ✅ FIXED
 
   // Crop recommendation database (rule-based logic)
   const cropDatabase: Record<string, any> = {
@@ -127,21 +128,29 @@ const FarmGuide = () => {
     const month = new Date().getMonth() + 1;
     if (month >= 6 && month <= 10) return 'Kharif';
     if (month >= 11 || month <= 3) return 'Rabi';
-    return 'Zaid';
+    return 'Kharif';
+  };
+  
+const classifySoil = async (imageFile: File): Promise<SoilClassification> => {
+    const formData = new FormData();
+    formData.append("image", imageFile);
+
+    const response = await fetch("http://127.0.0.1:5001/predict-soil", {
+      method: "POST",
+      body: formData
+    });
+
+    if (!response.ok) {
+      throw new Error("Soil classification failed");
+    }
+
+    const data = await response.json();
+    return {
+      soilType: data.soilType,
+      confidence: data.confidence
+    };
   };
 
-  // Simulate soil classification (replace with actual API call)
-  const classifySoil = async (imageFile: File): Promise<SoilClassification> => {
-    // TODO: Replace with actual API call
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          soilType: 'Black Soil',
-          confidence: 87.5
-        });
-      }, 2000);
-    });
-  };
 
   // Recommend crop based on parameters
   const recommendCrop = (soilType: string, season: string, rainfall: string, irrigation: string) => {
@@ -169,35 +178,28 @@ const FarmGuide = () => {
     }
   };
 
-  // Calculate yield
   const calculateYield = (
-    crop: string, 
-    soilType: string, 
-    length: number, 
-    width: number, 
-    unit: string, 
-    irrigation: string, 
+    crop: string,
+    soilType: string,
+    length: number,
+    width: number,
+    unit: string,
+    irrigation: string,
     rainfall: string
   ): YieldResult => {
-    let areaHectares: number;
-    
-    if (unit === 'meters') {
-      areaHectares = (length * width) / 10000;
-    } else if (unit === 'feet') {
-      areaHectares = (length * width) / 107639;
-    } else {
-      areaHectares = length;
-    }
 
-    const base = baseYield[crop] || 20;
-    const soilAdj = soilFactor[soilType] || 1.0;
-    const irrAdj = irrigationFactor[irrigation] || 1.0;
-    const rainAdj = rainfallFactor[rainfall] || 1.0;
+    let areaHectares =
+      unit === "meters" ? (length * width) / 10000 :
+      unit === "feet" ? (length * width) / 107639 :
+      length;
 
-    const yieldPerHectare = Math.min(base * soilAdj * irrAdj * rainAdj,base * 1.5);
+    const base = baseYield[crop] ?? 20;
+    const soilAdj = soilFactor[soilType] ?? 1.0;
+    const irrAdj = irrigationFactor[irrigation] ?? 1.0;
+    const rainAdj = rainfallFactor[rainfall] ?? 1.0;
 
+    const yieldPerHectare = Math.min(base * soilAdj * irrAdj * rainAdj, base * 1.5);
     const totalYield = yieldPerHectare * areaHectares;
-    const estimatedIncome = msp[crop] ? (totalYield * msp[crop]) : 0;
 
     return {
       areaHectares,
@@ -205,55 +207,50 @@ const FarmGuide = () => {
       yieldPerHectare,
       totalYield,
       totalYieldKg: totalYield * 100,
-      estimatedIncome
+      estimatedIncome: msp[crop] ? totalYield * msp[crop] : 0
     };
   };
 
-  // Handle image upload
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Create image preview
+    setCurrentScreen("analyzing");
+
     const reader = new FileReader();
-    reader.onload = (e) => {
-      setUploadedImage(e.target?.result as string);
-    };
+    reader.onload = e => setUploadedImage(e.target?.result as string);
     reader.readAsDataURL(file);
 
-    setCurrentScreen('analyzing');
+    try {
+      const soilResult = await classifySoil(file);
+      setSoilClassification(soilResult);
 
-    // Classify soil
-    const soilResult = await classifySoil(file);
-    setSoilClassification(soilResult);
+      const season = getCurrentSeason();
+      const rainfall = "Medium";
+      const irrigation = "Available";
 
-    // Auto-detect season
-    const season = getCurrentSeason();
+      const cropRec = recommendCrop(soilResult.soilType, season, rainfall, irrigation);
+      setCropRecommendation({ ...cropRec, season, rainfall, irrigation });
 
-    // For demo, using Medium rainfall and Available irrigation
-    const rainfall = 'Medium';
-    const irrigation = 'Available';
-
-    // Get crop recommendation
-    const cropRec = recommendCrop(soilResult.soilType, season, rainfall, irrigation);
-    
-    setCropRecommendation({
-      ...cropRec,
-      season,
-      rainfall,
-      irrigation
-    });
-
-    setCurrentScreen('results');
+      setCurrentScreen("results");
+    } catch (err) {
+      alert("Soil classification failed. Please try another image.");
+      resetAll();
+    }
   };
 
   // Handle yield calculation
-  const handleYieldCalculation = (formData: { length: string; width: string; unit: string }) => {
-    const { length, width, unit } = formData;
+  const handleYieldCalculation = ({
+  length,
+  width
+}: {
+  length: string;
+  width: string;
+}) => {
+  if (!cropRecommendation || !soilClassification) return;
 
-    if (!cropRecommendation || !soilClassification) return;
-
-    const result = calculateYield(
+  setYieldResult(
+    calculateYield(
       cropRecommendation.recommended,
       soilClassification.soilType,
       parseFloat(length),
@@ -261,10 +258,10 @@ const FarmGuide = () => {
       unit,
       cropRecommendation.irrigation,
       cropRecommendation.rainfall
-    );
+    )
+  );
+};
 
-    setYieldResult(result);
-  };
 
   const getSoilColor = (soilType: string) => {
     switch (soilType) {
@@ -518,8 +515,7 @@ const FarmGuide = () => {
                 const formData = new FormData(e.currentTarget); // FIXED: Changed to e.currentTarget
                 handleYieldCalculation({
                   length: formData.get('length') as string,
-                  width: formData.get('width') as string,
-                  unit: formData.get('unit') as string
+                  width: formData.get('width') as string
                 });
               }}>
                 <div className="space-y-4">
