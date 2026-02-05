@@ -53,8 +53,8 @@ const EarthFeed = () => {
     }
   ];
 
-  const filteredItems = selectedCategory === "All" 
-    ? feedItems 
+  const filteredItems = selectedCategory === "All"
+    ? feedItems
     : feedItems.filter(item => item.category === selectedCategory);
 
   const getCategoryColor = (category: string) => {
@@ -69,7 +69,7 @@ const EarthFeed = () => {
 
   return (
     <div className="min-h-screen bg-background p-4">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold mb-2 fade-in">Earth Feed</h1>
@@ -91,9 +91,8 @@ const EarthFeed = () => {
                 variant={selectedCategory === category ? "default" : "outline"}
                 size="sm"
                 onClick={() => setSelectedCategory(category)}
-                className={`hover-scale transition-all duration-200 ${
-                  selectedCategory === category ? "bg-gradient-primary" : ""
-                }`}
+                className={`hover-scale transition-all duration-200 ${selectedCategory === category ? "bg-gradient-primary" : ""
+                  }`}
               >
                 {category}
               </Button>
@@ -104,16 +103,16 @@ const EarthFeed = () => {
         {/* Feed Section */}
         <div className="space-y-6 mb-8">
           {filteredItems.map((item, index) => (
-            <Card 
-              key={item.id} 
-              className="eco-card hover-lift fade-in" 
+            <Card
+              key={item.id}
+              className="eco-card hover-lift fade-in"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
               <div className="flex flex-col md:flex-row gap-6">
                 {/* Image */}
                 <div className="md:w-48 h-48 md:h-32 flex-shrink-0">
-                  <img 
-                    src={item.image} 
+                  <img
+                    src={item.image}
                     alt={item.title}
                     className="w-full h-full object-cover rounded-lg"
                   />

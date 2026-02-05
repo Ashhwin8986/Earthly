@@ -21,7 +21,7 @@ interface Crop {
 const CropDetails = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   // Get crop data from navigation state or use fallback
   const cropData = location.state?.crop || {
     crop_name: "Tomatoes",
@@ -70,14 +70,14 @@ const CropDetails = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header Image */}
-      <div 
+      <div
         className="h-64 md:h-80 bg-cover bg-center relative"
         style={{ backgroundImage: `url(${cropImage})` }}
       >
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
       </div>
 
-      <div className="max-w-4xl mx-auto p-4 -mt-20 relative z-10">
+      <div className="max-w-5xl mx-auto p-4 -mt-20 relative z-10">
         {/* Main Content Card */}
         <Card className="eco-card fade-in">
           <div className="space-y-6">
@@ -161,9 +161,9 @@ const CropDetails = () => {
 
             {/* Back Button */}
             <div className="pt-6 border-t border-border">
-              <Button 
+              <Button
                 onClick={() => navigate('/growguide')}
-                variant="outline" 
+                variant="outline"
                 className="hover-scale"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />

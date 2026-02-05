@@ -47,26 +47,26 @@ const EcoHub = () => {
   return (
     <div className="min-h-screen landing-page -mt-[4rem]">  {/*added negative margin*/}
       {/* Hero Section */}
-      <section id="hero-section"  className="relative h-screen flex items-center justify-center overflow-hidden">
-        <div 
+      <section id="hero-section" className="relative h-screen flex items-center justify-center overflow-hidden">
+        <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: `url(${heroImage})` }}
         />
         <div className="absolute inset-0 bg-gradient-to-br from-primary/40 via-transparent to-accent/20 " />
-        
+
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 fade-in">
             Tracking Nature's
             <span className="block text-eco-highlight">Pulse, Beautifully</span>
           </h1>
           <p className="text-xl md:text-2xl text-white/90 mb-8 fade-in stagger-1 font-lora">
-            Monitor air quality, protect nature, and grow sustainably with 
+            Monitor air quality, protect nature, and grow sustainably with
             real-time environmental insights.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center fade-in stagger-2">
             <Link to={isSignedIn ? "/dashboard" : "/dashboard"}>
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 className="bg-white text-primary hover:bg-white/90 hover-scale"
               >
                 Start Monitoring
@@ -75,10 +75,10 @@ const EcoHub = () => {
             </Link>
 
             {/* Talk to Sprout opens ChatBot via icon click */}
-            <Button 
-              size="lg" 
+            <Button
+              size="lg"
               variant="outline"
-              className="border-white/60 text-white bg-transparent hover:bg-transparent backdrop-blur-sm hover:shadow-lg hover:shadow-white/10 hover:border-white/80" 
+              className="border-white/60 text-white bg-transparent hover:bg-transparent backdrop-blur-sm hover:shadow-lg hover:shadow-white/10 hover:border-white/80"
               onClick={handleTalkToSprout}
             >
               Talk To Sprout
@@ -89,7 +89,7 @@ const EcoHub = () => {
 
       {/* Features Section */}
       <section className="py-20 bg-background">
-        <div className="max-w-7xl mx-auto px-4">
+        <div className="max-w-5xl mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4 fade-in font-lora">
               Environmental Intelligence
@@ -122,7 +122,7 @@ const EcoHub = () => {
             Our Mission
           </h2>
           <p className="text-xl text-muted-foreground leading-relaxed fade-in stagger-1 font-lora">
-            To empower individuals, communities, and organizations with actionable 
+            To empower individuals, communities, and organizations with actionable
             environmental data that drives positive change for our planet's future.
           </p>
           <div className="mt-12 fade-in stagger-2">
