@@ -64,7 +64,7 @@ const TrashScan = () => {
 
   return (
     <div className="min-h-screen bg-background p-4">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold mb-2 fade-in">Trash Scan</h1>
@@ -97,14 +97,14 @@ const TrashScan = () => {
                   </Button>
                 </label>
               </div>
-              
+
               {/* Info Box */}
               <div className="flex items-start space-x-3 p-4 bg-secondary rounded-lg text-left">
                 <Info className="h-5 w-5 text-accent mt-0.5 flex-shrink-0" />
                 <div className="text-sm">
                   <p className="font-medium mb-1">How it works:</p>
                   <p className="text-muted-foreground">
-                    Our AI model analyzes your image to identify different types of waste and provides 
+                    Our AI model analyzes your image to identify different types of waste and provides
                     appropriate disposal recommendations based on environmental best practices.
                   </p>
                 </div>
@@ -114,9 +114,9 @@ const TrashScan = () => {
             <div className="space-y-6">
               {/* Image Preview */}
               <div className="text-center">
-                <img 
-                  src={uploadedImage} 
-                  alt="Uploaded waste" 
+                <img
+                  src={uploadedImage}
+                  alt="Uploaded waste"
                   className="max-w-full h-64 object-contain mx-auto rounded-lg"
                 />
               </div>

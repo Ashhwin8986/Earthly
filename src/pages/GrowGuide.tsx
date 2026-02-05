@@ -40,12 +40,12 @@ const GrowGuide = () => {
           .from('grow_guide_crops')
           .select('*')
           .eq('month', months[selectedMonth]);
-        
+
         if (error) {
           console.error('Error fetching crops:', error);
           throw new Error('Failed to load crops data');
         }
-        
+
         // Sanitize the data before returning
         return (data || []).map((crop: any) => ({
           ...crop,
@@ -125,7 +125,7 @@ const GrowGuide = () => {
   if (error) {
     return (
       <div className="min-h-screen bg-background p-4">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <Card className="eco-card p-8 text-center">
             <p className="text-red-600 mb-4">Unable to load crop data at this time.</p>
             <Button onClick={() => window.location.reload()} variant="outline">
@@ -139,7 +139,7 @@ const GrowGuide = () => {
 
   return (
     <div className="min-h-screen bg-background p-4">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2 fade-in">Grow Guide</h1>
@@ -284,8 +284,8 @@ const GrowGuide = () => {
                       </div>
                     )}
 
-                    <Button 
-                      className="w-full hover-scale" 
+                    <Button
+                      className="w-full hover-scale"
                       variant="outline"
                       onClick={() => handleViewDetails(crop)}
                     >
