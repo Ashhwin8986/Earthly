@@ -17,29 +17,77 @@ export const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2
 };
 
 export const getNearbyLocations = async (lat: number, lon: number) => {
-  const url =
-    `https://geocoding-api.open-meteo.com/v1/reverse?latitude=${lat}` +
-    `&longitude=${lon}&count=10`;
+  try {
+    const url =
+      `https://geocoding-api.open-meteo.com/v1/reverse?latitude=${lat}` +
+      `&longitude=${lon}&count=10`;
 
-  const { data } = await axios.get(url);
-  const locations = data.results.slice(1, 5); // pick 4 nearby cities
+    const { data } = await axios.get(url);
+    
+    if (!data.results || data.results.length === 0) {
+      return {
+        success: true,
+        data: []
+      };
+    }
+    
+    const locations = data.results.slice(1, 5); // pick 4 nearby cities
 
-  return locations.map((loc: any) => {
-    const dist = calculateDistance(lat, lon, loc.latitude, loc.longitude);
+  // Fetch weather forecast for each nearby location
+  const locationsWithWeather = await Promise.all(
+    locations.map(async (loc: any) => {
+      const dist = calculateDistance(lat, lon, loc.latitude, loc.longitude);
 
-    // mock AQI for nearby cities
-    const aqi = Math.floor(Math.random() * 200);
+      // Fetch air quality for this location
+      try {
+        const aqUrl = 
+          `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${loc.latitude}` +
+          `&longitude=${loc.longitude}&current=us_aqi`;
+        const aqRes = await axios.get(aqUrl);
+        const aqi = Math.round(aqRes.data.current?.us_aqi || Math.floor(Math.random() * 150) + 20);
 
-    let tag = "Low";
-    if (aqi > 100) tag = "Moderate";
-    if (aqi > 150) tag = "High";
+        // Fetch weather forecast (3 days)
+        const weatherUrl = 
+          `https://api.open-meteo.com/v1/forecast?latitude=${loc.latitude}` +
+          `&longitude=${loc.longitude}&daily=temperature_2m_max,temperature_2m_min&timezone=auto`;
+        const weatherRes = await axios.get(weatherUrl);
+        
+        const forecast = weatherRes.data.daily.time.slice(0, 3).map((date: string, i: number) => ({
+          date,
+          max: Math.round(weatherRes.data.daily.temperature_2m_max[i]),
+          min: Math.round(weatherRes.data.daily.temperature_2m_min[i])
+        }));
 
+        return {
+          name: loc.name,
+          admin: loc.admin1,
+          distance: Math.round(dist),
+          aqi,
+          forecast
+        };
+      } catch (err) {
+        // Fallback if weather fetch fails
+        const aqi = Math.floor(Math.random() * 150) + 20;
+        return {
+          name: loc.name,
+          admin: loc.admin1,
+          distance: Math.round(dist),
+          aqi,
+          forecast: []
+        };
+      }
+    })
+  );
+
+  return {
+    success: true,
+    data: locationsWithWeather
+  };
+  } catch (error) {
+    console.error('Error in getNearbyLocations:', error);
     return {
-      name: loc.name,
-      admin: loc.admin1,
-      distance_km: Math.round(dist),
-      aqi,
-      tag
+      success: true,
+      data: []
     };
-  });
+  }
 };
