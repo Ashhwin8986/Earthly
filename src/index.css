@@ -74,24 +74,35 @@
   }
 
   .dark {
-    /* Dark mode for environmental data - deep earth tones */
-    --background: 25 25% 8%;
-    /* Deep earth dark */
-    --foreground: 42 15% 95%;
-    --card: 25 25% 10%;
-    --card-foreground: 42 15% 95%;
-    --primary: 85 45% 65%;
-    /* Brighter eco green for dark mode */
-    --primary-foreground: 25 25% 8%;
-    --secondary: 25 20% 15%;
-    --secondary-foreground: 42 15% 95%;
-    --muted: 25 20% 15%;
-    --muted-foreground: 35 15% 70%;
-    --accent: 194 45% 65%;
-    --accent-foreground: 25 25% 8%;
-    --border: 25 20% 20%;
-    --input: 25 20% 20%;
-    --ring: 85 45% 65%;
+    /* Deep Forest Night Theme */
+    --background: 140 15% 10%;
+    /* Deep greenish-charcoal */
+    --foreground: 60 10% 90%;
+    /* Warm sand white */
+
+    --card: 140 15% 13%;
+    /* Slightly lighter deep green-grey */
+    --card-foreground: 60 10% 90%;
+
+    --primary: 140 35% 55%;
+    /* Muted sage green */
+    --primary-foreground: 140 15% 10%;
+
+    --secondary: 140 15% 20%;
+    /* Dark organic secondary */
+    --secondary-foreground: 60 10% 90%;
+
+    --muted: 140 15% 20%;
+    --muted-foreground: 140 10% 60%;
+    /* Muted grey-green text */
+
+    --accent: 180 30% 50%;
+    /* Muted teal accent */
+    --accent-foreground: 60 10% 90%;
+
+    --border: 140 15% 20%;
+    --input: 140 15% 20%;
+    --ring: 140 35% 55%;
   }
 }
 

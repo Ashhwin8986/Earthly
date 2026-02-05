@@ -1,11 +1,10 @@
-
-import { useState } from "react";
-import { 
-  Drawer, 
-  DrawerContent, 
-  DrawerHeader, 
+import { useState, useEffect } from "react";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
   DrawerTitle,
-  DrawerClose 
+  DrawerClose
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -13,15 +12,14 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { 
-  Settings, 
-  Heart, 
-  LogOut, 
-  X, 
-  Camera, 
+import {
+  Settings,
+  Heart,
+  LogOut,
+  X,
+  Camera,
   Lock,
   User,
-  Bell,
   Shield,
   Info
 } from "lucide-react";
@@ -36,14 +34,21 @@ interface ProfileDrawerProps {
 const ProfileDrawer = ({ isOpen, onClose }: ProfileDrawerProps) => {
   const { user, signOut } = useAuth();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  // Initialize dark mode from system preference or local storage if needed, 
+  // but for now keeping it simple as requested, triggering side effect.
   const [darkMode, setDarkMode] = useState(false);
-  const [notifications, setNotifications] = useState({
-    newChallenges: true,
-    earthFeedUpdates: false,
-    tipsMilestones: true,
-    trashScanResults: true,
-  });
+
   const [analyticsConsent, setAnalyticsConsent] = useState(true);
+
+  // Toggle dark class on html element
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [darkMode]);
 
   const getInitials = (email: string) => {
     return email.substring(0, 2).toUpperCase();
@@ -76,24 +81,24 @@ const ProfileDrawer = ({ isOpen, onClose }: ProfileDrawerProps) => {
               </Button>
             </DrawerClose>
             <DrawerTitle className="sr-only">Profile</DrawerTitle>
-            
+
             {/* Profile Picture */}
             <div className="flex justify-center mb-4">
               <div className="h-20 w-20 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-2xl font-bold shadow-lg">
                 {getInitials(user.email || "")}
               </div>
             </div>
-            
+
             {/* Username */}
             <h2 className="text-xl font-bold text-foreground mb-1">
               {user.email?.split('@')[0] || "User"}
             </h2>
-            
+
             {/* Member Since */}
             <p className="text-sm text-muted-foreground mb-3">
               Member since {getMemberSince()}
             </p>
-            
+
             {/* Bio */}
             <p className="text-sm text-foreground/80 max-w-xs mx-auto leading-relaxed">
               Passionate about environmental conservation and sustainable living.
@@ -163,19 +168,19 @@ const ProfileDrawer = ({ isOpen, onClose }: ProfileDrawerProps) => {
                 <User className="h-4 w-4 text-primary" />
                 <h3 className="font-semibold">Account Settings</h3>
               </div>
-              
+
               <div className="space-y-3 pl-6">
                 <div>
                   <Label htmlFor="username">Username</Label>
                   <Input id="username" defaultValue={user.email?.split('@')[0]} className="mt-1" />
                 </div>
-                
+
                 <div>
                   <Label htmlFor="bio">Bio</Label>
-                  <Textarea 
-                    id="bio" 
-                    placeholder="Tell us about yourself..." 
-                    className="mt-1 resize-none" 
+                  <Textarea
+                    id="bio"
+                    placeholder="Tell us about yourself..."
+                    className="mt-1 resize-none"
                     rows={2}
                   />
                 </div>
@@ -200,7 +205,7 @@ const ProfileDrawer = ({ isOpen, onClose }: ProfileDrawerProps) => {
                 <Settings className="h-4 w-4 text-primary" />
                 <h3 className="font-semibold">App Preferences</h3>
               </div>
-              
+
               <div className="space-y-3 pl-6">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="dark-mode">Dark Mode</Label>
@@ -209,55 +214,6 @@ const ProfileDrawer = ({ isOpen, onClose }: ProfileDrawerProps) => {
                     checked={darkMode}
                     onCheckedChange={setDarkMode}
                   />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label>Notification Preferences</Label>
-                  <div className="space-y-2 ml-4">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="new-challenges" className="text-sm">New Challenges</Label>
-                      <Switch
-                        id="new-challenges"
-                        checked={notifications.newChallenges}
-                        onCheckedChange={(checked) => 
-                          setNotifications(prev => ({ ...prev, newChallenges: checked }))
-                        }
-                      />
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="earth-feed" className="text-sm">Earth Feed Updates</Label>
-                      <Switch
-                        id="earth-feed"
-                        checked={notifications.earthFeedUpdates}
-                        onCheckedChange={(checked) => 
-                          setNotifications(prev => ({ ...prev, earthFeedUpdates: checked }))
-                        }
-                      />
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="tips-milestones" className="text-sm">Tips & Milestones</Label>
-                      <Switch
-                        id="tips-milestones"
-                        checked={notifications.tipsMilestones}
-                        onCheckedChange={(checked) => 
-                          setNotifications(prev => ({ ...prev, tipsMilestones: checked }))
-                        }
-                      />
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="trash-scan" className="text-sm">Trash Scan Results</Label>
-                      <Switch
-                        id="trash-scan"
-                        checked={notifications.trashScanResults}
-                        onCheckedChange={(checked) => 
-                          setNotifications(prev => ({ ...prev, trashScanResults: checked }))
-                        }
-                      />
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
@@ -270,7 +226,7 @@ const ProfileDrawer = ({ isOpen, onClose }: ProfileDrawerProps) => {
                 <Shield className="h-4 w-4 text-primary" />
                 <h3 className="font-semibold">Privacy Controls</h3>
               </div>
-              
+
               <div className="space-y-3 pl-6">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="analytics-consent">Analytics Consent</Label>
@@ -280,11 +236,11 @@ const ProfileDrawer = ({ isOpen, onClose }: ProfileDrawerProps) => {
                     onCheckedChange={setAnalyticsConsent}
                   />
                 </div>
-                
+
                 <Button variant="outline" size="sm" className="w-full">
                   Manage Data Sharing
                 </Button>
-                
+
                 <Button variant="outline" size="sm" className="w-full text-red-600 border-red-200 hover:bg-red-50">
                   Request Data Deletion
                 </Button>
@@ -299,12 +255,12 @@ const ProfileDrawer = ({ isOpen, onClose }: ProfileDrawerProps) => {
                 <Info className="h-4 w-4 text-primary" />
                 <h3 className="font-semibold">About App</h3>
               </div>
-              
+
               <div className="pl-6 space-y-2">
                 <Button variant="outline" size="sm" className="w-full">
                   Developer Info & Credits
                 </Button>
-                
+
                 <p className="text-xs text-muted-foreground text-center pt-4">
                   Version 1.3.2
                 </p>
