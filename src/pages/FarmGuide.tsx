@@ -130,8 +130,8 @@ const FarmGuide = () => {
     if (month >= 11 || month <= 3) return 'Rabi';
     return 'Kharif';
   };
-  
-const classifySoil = async (imageFile: File): Promise<SoilClassification> => {
+
+  const classifySoil = async (imageFile: File): Promise<SoilClassification> => {
     const formData = new FormData();
     formData.append("image", imageFile);
 
@@ -190,8 +190,8 @@ const classifySoil = async (imageFile: File): Promise<SoilClassification> => {
 
     let areaHectares =
       unit === "meters" ? (length * width) / 10000 :
-      unit === "feet" ? (length * width) / 107639 :
-      length;
+        unit === "feet" ? (length * width) / 107639 :
+          length;
 
     const base = baseYield[crop] ?? 20;
     const soilAdj = soilFactor[soilType] ?? 1.0;
@@ -241,26 +241,26 @@ const classifySoil = async (imageFile: File): Promise<SoilClassification> => {
 
   // Handle yield calculation
   const handleYieldCalculation = ({
-  length,
-  width
-}: {
-  length: string;
-  width: string;
-}) => {
-  if (!cropRecommendation || !soilClassification) return;
+    length,
+    width
+  }: {
+    length: string;
+    width: string;
+  }) => {
+    if (!cropRecommendation || !soilClassification) return;
 
-  setYieldResult(
-    calculateYield(
-      cropRecommendation.recommended,
-      soilClassification.soilType,
-      parseFloat(length),
-      parseFloat(width),
-      unit,
-      cropRecommendation.irrigation,
-      cropRecommendation.rainfall
-    )
-  );
-};
+    setYieldResult(
+      calculateYield(
+        cropRecommendation.recommended,
+        soilClassification.soilType,
+        parseFloat(length),
+        parseFloat(width),
+        unit,
+        cropRecommendation.irrigation,
+        cropRecommendation.rainfall
+      )
+    );
+  };
 
 
   const getSoilColor = (soilType: string) => {
@@ -286,7 +286,7 @@ const classifySoil = async (imageFile: File): Promise<SoilClassification> => {
   if (currentScreen === 'upload') {
     return (
       <div className="min-h-screen bg-background p-4">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <div className="mb-8 text-center">
             <h1 className="text-4xl font-bold mb-2 fade-in">Farm Guide</h1>
             <p className="text-xl text-muted-foreground fade-in stagger-1">
@@ -305,7 +305,7 @@ const classifySoil = async (imageFile: File): Promise<SoilClassification> => {
                   Take a clear photo of your soil for instant analysis
                 </p>
               </div>
-              
+
               <div className="max-w-md mx-auto">
                 <label htmlFor="image-upload" className="block">
                   <div className="border-2 border-dashed border-border rounded-lg p-8 hover:border-primary/50 transition-colors cursor-pointer group">
@@ -346,7 +346,7 @@ const classifySoil = async (imageFile: File): Promise<SoilClassification> => {
   if (currentScreen === 'analyzing') {
     return (
       <div className="min-h-screen bg-background p-4">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <div className="mb-8 text-center">
             <h1 className="text-4xl font-bold mb-2">Farm Guide</h1>
           </div>
@@ -377,10 +377,10 @@ const classifySoil = async (imageFile: File): Promise<SoilClassification> => {
 
   return (
     <div className="min-h-screen bg-background p-4">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         <div className="mb-8">
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             onClick={resetAll}
             className="mb-4"
           >
@@ -400,9 +400,9 @@ const classifySoil = async (imageFile: File): Promise<SoilClassification> => {
           <Card className="eco-card">
             <div className="flex flex-col md:flex-row items-center gap-6">
               {uploadedImage && (
-                <img 
-                  src={uploadedImage} 
-                  alt="Uploaded soil" 
+                <img
+                  src={uploadedImage}
+                  alt="Uploaded soil"
                   className="w-32 h-32 object-cover rounded-lg"
                 />
               )}
@@ -430,7 +430,7 @@ const classifySoil = async (imageFile: File): Promise<SoilClassification> => {
               <Sprout className="h-5 w-5 mr-2 text-green-500" />
               Recommended Crop for Your Field
             </h3>
-            
+
             <div className="p-8 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg text-center mb-6">
               <Leaf className="h-16 w-16 text-green-600 mx-auto mb-4" />
               <h2 className="text-4xl font-bold text-green-700 dark:text-green-400 mb-3">
@@ -492,7 +492,7 @@ const classifySoil = async (imageFile: File): Promise<SoilClassification> => {
                 <p className="text-muted-foreground mb-6">
                   Calculate estimated crop yield and income for your land
                 </p>
-                <Button 
+                <Button
                   onClick={() => setShowYieldCalculator(true)}
                   className="bg-gradient-primary"
                 >
@@ -522,29 +522,29 @@ const classifySoil = async (imageFile: File): Promise<SoilClassification> => {
                   <p className="text-sm text-muted-foreground">
                     Enter your land dimensions to calculate expected yield
                   </p>
-                  
+
                   <div className="grid md:grid-cols-3 gap-4">
                     <div>
                       <Label htmlFor="length">Length</Label>
-                      <Input 
+                      <Input
                         id="length"
                         name="length"
-                        type="number" 
+                        type="number"
                         step="0.01"
-                        placeholder="100" 
-                        required 
+                        placeholder="100"
+                        required
                       />
                     </div>
 
                     <div>
                       <Label htmlFor="width">Width</Label>
-                      <Input 
+                      <Input
                         id="width"
                         name="width"
-                        type="number" 
+                        type="number"
                         step="0.01"
-                        placeholder="80" 
-                        required 
+                        placeholder="80"
+                        required
                       />
                     </div>
 
@@ -564,9 +564,9 @@ const classifySoil = async (imageFile: File): Promise<SoilClassification> => {
                   </div>
 
                   <div className="flex gap-4 pt-4">
-                    <Button 
+                    <Button
                       type="button"
-                      variant="outline" 
+                      variant="outline"
                       onClick={() => setShowYieldCalculator(false)}
                       className="flex-1"
                     >
@@ -588,7 +588,7 @@ const classifySoil = async (imageFile: File): Promise<SoilClassification> => {
                 <TrendingUp className="h-5 w-5 mr-2 text-blue-500" />
                 Yield Prediction for {cropRecommendation.recommended}
               </h3>
-              
+
               <div className="grid md:grid-cols-3 gap-4 mb-6">
                 <div className="p-4 bg-secondary rounded-lg text-center">
                   <p className="text-sm text-muted-foreground mb-1">Land Area</p>
@@ -632,13 +632,13 @@ const classifySoil = async (imageFile: File): Promise<SoilClassification> => {
 
               <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
                 <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                  ⚠️ Note: These are estimated values based on standard agricultural data. 
+                  ⚠️ Note: These are estimated values based on standard agricultural data.
                   Actual yield may vary based on farming practices, weather conditions, and pest management.
                 </p>
               </div>
 
               <div className="mt-4 text-center">
-                <Button 
+                <Button
                   variant="outline"
                   onClick={() => {
                     setYieldResult(null);
@@ -653,8 +653,8 @@ const classifySoil = async (imageFile: File): Promise<SoilClassification> => {
 
           {/* Action Buttons */}
           <div className="text-center space-x-4 pb-8">
-            <Button 
-              onClick={resetAll} 
+            <Button
+              onClick={resetAll}
               variant="outline"
             >
               Analyze Another Field
