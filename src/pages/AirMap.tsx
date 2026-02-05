@@ -37,49 +37,49 @@ const AirMap = () => {
       return;
     }
 
-    
-const fetchData = async () => {
-  try {
-    setError("");
 
-    // 1) AIR QUALITY
-    const aq = await fetch(`${API_BASE}/api/air?lat=${lat}&lon=${lon}`);
-    const aqJson = await aq.json();
-    if (!aqJson.success) throw new Error("Air quality fetch failed");
+    const fetchData = async () => {
+      try {
+        setError("");
 
-    setAirQualityData({
-      aqi: aqJson.data.aqi,
-      level: getAQILevel(aqJson.data.aqi),
-      color: getAQIColor(aqJson.data.aqi),
-      recommendation: aqJson.data.recommendation
-    });
+        // 1) AIR QUALITY
+        const aq = await fetch(`${API_BASE}/api/air?lat=${lat}&lon=${lon}`);
+        const aqJson = await aq.json();
+        if (!aqJson.success) throw new Error("Air quality fetch failed");
 
-    // 2) WEATHER CONDITIONS
-    const wf = await fetch(`${API_BASE}/api/weather/forecast?lat=${lat}&lon=${lon}`);
-    const wfJson = await wf.json();
+        setAirQualityData({
+          aqi: aqJson.data.aqi,
+          level: getAQILevel(aqJson.data.aqi),
+          color: getAQIColor(aqJson.data.aqi),
+          recommendation: aqJson.data.recommendation
+        });
 
-    setWeatherData({
-      temperature: wfJson.today.temp,
-      humidity: wfJson.today.humidity,
-      windSpeed: wfJson.today.wind,
-      visibility: wfJson.today.visibility || 8
-    });
+        // 2) WEATHER CONDITIONS
+        const wf = await fetch(`${API_BASE}/api/weather/forecast?lat=${lat}&lon=${lon}`);
+        const wfJson = await wf.json();
 
-    // 3) NEARBY LOCATIONS
-    const near = await fetch(`${API_BASE}/api/weather/nearby?lat=${lat}&lon=${lon}`);
-    const nearJson = await near.json();
+        setWeatherData({
+          temperature: wfJson.today.temp,
+          humidity: wfJson.today.humidity,
+          windSpeed: wfJson.today.wind,
+          visibility: wfJson.today.visibility || 8
+        });
 
-    setNearbyStations(
-      (nearJson.data || []).map((st: any) => ({
-        name: st.name,
-        aqi: st.aqi,
-        distance: `${st.distance} km`
-      }))
-    );
-  } catch (err: any) {
-    setError(err.message || "Something went wrong");
-  }
-};
+        // 3) NEARBY LOCATIONS
+        const near = await fetch(`${API_BASE}/api/weather/nearby?lat=${lat}&lon=${lon}`);
+        const nearJson = await near.json();
+
+        setNearbyStations(
+          (nearJson.data || []).map((st: any) => ({
+            name: st.name,
+            aqi: st.aqi,
+            distance: `${st.distance} km`
+          }))
+        );
+      } catch (err: any) {
+        setError(err.message || "Something went wrong");
+      }
+    };
 
     fetchData();
   }, [lat, lon]);
@@ -88,7 +88,7 @@ const fetchData = async () => {
 
   return (
     <div className="min-h-screen bg-background p-4">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2 fade-in">Air Map</h1>
           <p className="text-xl text-muted-foreground fade-in stagger-1">

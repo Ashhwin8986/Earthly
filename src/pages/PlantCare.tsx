@@ -50,7 +50,7 @@ const PlantCare = () => {
 
   return (
     <div className="min-h-screen bg-background p-4">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="mb-8 text-center">
           <h1 className="text-4xl font-bold mb-2 fade-in">Plant Care</h1>
@@ -71,7 +71,7 @@ const PlantCare = () => {
                   Take a clear photo of your plant for instant health analysis
                 </p>
               </div>
-              
+
               <div className="max-w-md mx-auto">
                 <div className="border-2 border-dashed border-border rounded-lg p-8 hover:border-primary/50 transition-colors cursor-pointer group">
                   <Upload className="h-12 w-12 text-muted-foreground group-hover:text-primary mx-auto mb-4 transition-colors" />
@@ -129,9 +129,9 @@ const PlantCare = () => {
                   <p className="text-sm text-muted-foreground">Health Score</p>
                 </div>
               </div>
-              
+
               <Progress value={analysisResult.healthScore} className="mb-4" />
-              
+
               <div className="flex items-center space-x-2">
                 {analysisResult.healthScore >= 80 ? (
                   <CheckCircle className="h-5 w-5 text-green-500" />
@@ -139,8 +139,8 @@ const PlantCare = () => {
                   <AlertCircle className="h-5 w-5 text-yellow-500" />
                 )}
                 <span className="text-sm">
-                  {analysisResult.healthScore >= 80 
-                    ? "Your plant is in good health!" 
+                  {analysisResult.healthScore >= 80
+                    ? "Your plant is in good health!"
                     : "Some issues detected - see recommendations below"
                   }
                 </span>
@@ -203,8 +203,8 @@ const PlantCare = () => {
             </Card>
 
             <div className="text-center">
-              <Button 
-                onClick={() => setAnalysisResult(null)} 
+              <Button
+                onClick={() => setAnalysisResult(null)}
                 variant="outline"
                 className="mr-4"
               >
