@@ -13,7 +13,7 @@ import {
   Plus
 } from "lucide-react";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 type ForecastDay = {
@@ -24,6 +24,7 @@ type ForecastDay = {
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // -----------------------------
   // STATE (persistent via localStorage)
@@ -71,6 +72,26 @@ const Dashboard = () => {
   }, [forecast]);
 
   // -----------------------------
+  // HORIZONTAL SCROLL ON WHEEL
+  // -----------------------------
+  useEffect(() => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+
+    const onWheel = (e: WheelEvent) => {
+      if (e.deltaY === 0) return;
+      // If content is scrollable horizontally
+      if (el.scrollWidth > el.clientWidth) {
+        e.preventDefault();
+        el.scrollLeft += e.deltaY;
+      }
+    };
+
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, []);
+
+  // -----------------------------
   // LOCATION SEARCH + FORECAST
   // -----------------------------
   const handleLocationEdit = () => setShowLocationInput((v) => !v);
@@ -96,9 +117,8 @@ const Dashboard = () => {
 
       setLastCoords({ lat, lon });
 
-      const formattedName = `${best.name}${best.state ? ", " + best.state : ""}${
-        best.country ? ", " + best.country : ""
-      }`;
+      const formattedName = `${best.name}${best.state ? ", " + best.state : ""}${best.country ? ", " + best.country : ""
+        }`;
       setUserLocation(formattedName);
       setShowLocationInput(false);
 
@@ -318,78 +338,102 @@ const Dashboard = () => {
           </div>
         </Card>
 
-       {/* Swap It - Eco Products */}
-        <Card className="eco-card fade-in stagger-5 hover-lift mb-6"> 
+        {/* Swap It - Eco Products */}
+        <Card className="eco-card fade-in stagger-5 hover-lift mb-6">
           <h3 className="text-lg font-semibold mb-4 flex items-center">
-             <Leaf className="h-5 w-5 mr-2 text-primary" />
-              Swap It </h3> 
-              <div className="relative overflow-hidden">
-                 <div className="flex animate-marquee hover:animation-pause space-x-4 py-2">
-                   {[
-                     {
-                     name: "Bamboo Toothbrush", 
-                     description: "Sustainably grown bamboo handle",
-                     image: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=300&h=200&fit=crop", 
-                     url: "https://amazon.com/bamboo-toothbrush"
-                     },
-                     { 
-                      name: "Reusable Silicone Food Bag", 
-                      description: "Perfect for meal prep", 
-                      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&h=200&fit=crop", 
-                      url: "https://amazon.com/silicone-food-bag" 
-                     }, 
-                     { 
-                      name: "Compostable Bamboo Dinnerware", 
-                      description: "24 piece sustainable dining set", 
-                      image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=200&fit=crop", 
-                      url: "https://amazon.com/bamboo-dinnerware" 
-                      }, 
-                      { 
-                       name: "Organic Vegetable Seed Kit", 
-                       description: "Tomatoes, lettuce, and herbs starter kit", 
-                       image: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=300&h=200&fit=crop", 
-                       url: "https://amazon.com/vegetable-seed-kit" 
-                       }, 
-                       { 
-                        name: "Reusable Jute Shopping Bag", 
-                        description: "Biodegradable and durable", 
-                        image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=300&h=200&fit=crop", 
-                        url: "https://amazon.com/jute-shopping-bag" 
-                        }, 
-                        { 
-                        name: "Air-Purifying Peace Lily", 
-                        description: "Indoor plant in recycled pot", 
-                        image: "https://images.unsplash.com/photo-1463320726281-696a485928c7?w=300&h=200&fit=crop", 
-                        url: "https://amazon.com/peace-lily-plant" 
-                        }, 
-                        { 
-                          name: "Biodegradable Dish Soap Bar", 
-                          description: "Lavender scented natural cleaning", 
-                          image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=300&h=200&fit=crop", 
-                          url: "https://amazon.com/dish-soap-bar" 
-                        }, 
-                        { 
-                          name: "Coconut Fiber Scrub Pads", 
-                          description: "Natural cleaning pads - pack of 6", 
-                          image: "https://images.unsplash.com/photo-1563453392212-326f5e854473?w=300&h=200&fit=crop", 
-                          url: "https://amazon.com/coconut-scrub-pads" 
-                          } 
-                        ].map((product, index) => ( 
-                        <div key={index} className="flex-shrink-0 w-64 bg-secondary/30 rounded-lg p-4 hover:bg-secondary/50 hover:shadow-lg hover:scale-105 transition-all duration-300 group" style={{ animationPlayState: 'inherit' }} > 
-                        <div className="relative overflow-hidden rounded-md mb-3"> 
-                        <img src={product.image} alt={product.name} className="w-full h-32 object-cover group-hover:scale-110 transition-transform duration-300" /> 
-                        </div> 
-                        <h4 className="font-medium text-sm mb-2 text-foreground">{product.name}</h4> 
-                        <p className="text-xs text-muted-foreground mb-3 line-clamp-2">{product.description}</p> 
-                        <Button size="sm" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground hover-scale focus:ring-2 focus:ring-primary focus:ring-offset-2" onClick={() => window.open(product.url, '_blank')} tabIndex={0} >
-                         Buy on Amazon </Button> 
-                         </div> 
-                        ))} 
-                        </div> 
-                        </div> 
-                        </Card>
+            <Leaf className="h-5 w-5 mr-2 text-primary" />
+            Swap It </h3>
+          <div className="relative">
+            <div ref={scrollContainerRef} className="flex space-x-4 py-4 overflow-x-auto pb-6 scrollbar-hide snap-x items-stretch">
+              {[
+                {
+                  name: "Bamboo Toothbrush",
+                  description: "Sustainably grown bamboo handle",
+                  image: "https://res.cloudinary.com/dbjycvdlk/image/upload/v1770274359/Screenshot_2026-02-05_121708_qdkr2x.png",
+                  url: "https://www.amazon.in/Vernam-Toothbrush-Biodegradable-Bristles-Plastic-Free/dp/B0FFN9G54M/ref=sr_1_1_sspa?sr=8-1-spons&aref=BNwatpoUzP&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY"
+                },
+                {
+                  name: "Reusable Silicone Food Bag",
+                  description: "Perfect for meal prep",
+                  image: "https://res.cloudinary.com/dbjycvdlk/image/upload/v1770274612/Screenshot_2026-02-05_122552_wnubxs.png",
+                  url: "https://www.amazon.in/Top-Chef-Stasher-Reusable-Silicone/dp/B08WPWHZ5K/ref=sr_1_11?sr=8-11"
+                },
+                {
+                  name: "Compostable Bamboo Dinnerware",
+                  description: "24 piece sustainable dining set",
+                  image: "https://res.cloudinary.com/dbjycvdlk/image/upload/v1770274729/Screenshot_2026-02-05_122833_xul5gs.png",
+                  url: "https://www.amazon.in/Pacing-Grass-Microwave-Bio-Composite-Breakfast/dp/B0F7HL4D6N/ref=sr_1_5?sr=8-5"
+                },
+                {
+                  name: "Organic Vegetable Seed Kit",
+                  description: "Tomatoes, lettuce, and herbs starter kit",
+                  image: "https://res.cloudinary.com/dbjycvdlk/image/upload/v1770276262/Screenshot_2026-02-05_125406_k5z36y.png",
+                  url: "https://www.amazon.in/Seeds-Cart-Non-Hybrid-Pollinated-Vegetable/dp/B0F5P7YXZ4/ref=sxin_14_pa_sp_search_thematic_sspa?cv_ct_cx=Organic+Vegetable+Seed+Kit&sbo=RZvfv%2F%2FHxDF%2BO5021pAnSA%3D%3D&sr=1-1-66673dcf-083f-43ba-b782-d4a436cc5cfb-spons&aref=jva2V94Vfn&sp_csd=d2lkZ2V0TmFtZT1zcF9zZWFyY2hfdGhlbWF0aWM&psc=1"
+                },
+                {
+                  name: "Reusable Jute Shopping Bag",
+                  description: "Biodegradable and durable",
+                  image: "https://res.cloudinary.com/dbjycvdlk/image/upload/v1770276386/Screenshot_2026-02-05_125613_fcbgoj.png",
+                  url: "https://www.amazon.in/Sangra-Eco-Friendly-Bag-Reusable-Shopping-Multipurpose/dp/B0C5XP65MG/ref=sr_1_3_sspa?sr=8-3-spons&aref=7vIxgJe4eb&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY&psc=1&smid=A3HI39PKZNTEN3"
+                },
+                {
+                  name: "Air-Purifying Peace Lily",
+                  description: "Indoor plant in recycled pot",
+                  image: "https://res.cloudinary.com/dbjycvdlk/image/upload/v1770276451/Screenshot_2026-02-05_125718_hd8dsy.png",
+                  url: "https://www.amazon.in/UGAOO-Indoor-Flowering-Air-Purifying-Bedroom/dp/B0F9FRQB6R/ref=sr_1_1_sspa?sr=8-1-spons&aref=Btd15tcGtw&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY"
+                },
+                {
+                  name: "Biodegradable Dish Soap Bar",
+                  description: "Lavender scented natural cleaning",
+                  image: "https://res.cloudinary.com/dbjycvdlk/image/upload/v1770276634/Screenshot_2026-02-05_130018_ttwjod.png",
+                  url: "https://www.amazon.in/NATUUR-Dish-Cleaning-Bar-grams/dp/B07G3865WH/ref=sr_1_5?sr=8-5"
+                },
+                {
+                  name: "Coconut Fiber Scrub Pads",
+                  description: "Natural cleaning pads - pack of 6",
+                  image: "https://res.cloudinary.com/dbjycvdlk/image/upload/v1770276757/Screenshot_2026-02-05_130224_d2kyuq.png",
+                  url: "https://www.amazon.in/Scrubber-Dishwashing-Friendly-Biodegradable-Long-Lasting/dp/B0FZ5D882H/ref=sr_1_5?sr=8-5"
+                },
+                {
+                  name: "Solar-Powered LED Garden Lights",
+                  description: "Energy-efficient outdoor lighting powered by sunlight",
+                  image: "https://res.cloudinary.com/dbjycvdlk/image/upload/v1770277527/Screenshot_2026-02-05_131514_cgsqat.png",
+                  url: "https://www.amazon.in/ALFIOT-Waterproof-Landscape-Lighting-Driveway/dp/B0GJCFFK13/ref=sxin_14_pa_sp_search_thematic_sspa?cv_ct_cx=Solar-Powered%2BLED%2BGarden%2BLights&sbo=RZvfv%2F%2FHxDF%2BO5021pAnSA%3D%3D&sr=1-2-66673dcf-083f-43ba-b782-d4a436cc5cfb-spons&aref=FUCoOOqofz&sp_csd=d2lkZ2V0TmFtZT1zcF9zZWFyY2hfdGhlbWF0aWM"
+                },
+                {
+                  name: "Stainless Steel Reusable Water Bottle",
+                  description: "BPA-free insulated bottle for hot & cold drinks",
+                  image: "https://res.cloudinary.com/dbjycvdlk/image/upload/v1770277653/Screenshot_2026-02-05_131719_tx0j3x.png",
+                  url: "https://www.amazon.in/NOVOALTER-Stainless-Carrying-Reusable-Patients/dp/B0GK1XQK2V/ref=sr_1_1_sspa?sr=8-1-spons&aref=rqnVibSg1U&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY&psc=1"
+                },
+                {
+                  name: "Beeswax Food Wraps",
+                  description: "Reusable alternative to plastic cling wrap",
+                  image: "https://res.cloudinary.com/dbjycvdlk/image/upload/v1770277854/Screenshot_2026-02-05_132020_mgqo4q.png",
+                  url: "https://www.amazon.in/Urban-Creative-Certified-Organic-Assorted/dp/B07MFW3KJS/ref=sr_1_1_sspa?sr=8-1-spons&aref=55kAFXEvgf&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY&psc=1"
+                },
+                {
+                  name: "Coconut Fiber Scrub Pads",
+                  description: "Plastic-free cotton swabs with bamboo sticks",
+                  image: "https://res.cloudinary.com/dbjycvdlk/image/upload/v1770277994/Screenshot_2026-02-05_132300_qlnu9i.png",
+                  url: "https://www.amazon.in/VEDAeco-Cotton-Buds-Premium-Personal/dp/B0FQJNJLX1/ref=sr_1_5?sr=8-5"
+                }
+              ].map((product, index) => (
+                <div key={index} className="flex-shrink-0 w-64 bg-secondary/30 rounded-lg p-4 hover:bg-secondary/50 hover:shadow-lg transition-all duration-300 group flex flex-col h-full snap-center" >
+                  <div className="relative overflow-hidden rounded-md mb-3">
+                    <img src={product.image} alt={product.name} className="w-full h-32 object-cover group-hover:scale-110 transition-transform duration-300" />
+                  </div>
+                  <h4 className="font-medium text-sm mb-2 text-foreground line-clamp-2 h-10">{product.name}</h4>
+                  <p className="text-xs text-muted-foreground mb-3 line-clamp-2 h-8">{product.description}</p>
+                  <Button size="sm" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground hover-scale focus:ring-2 focus:ring-primary focus:ring-offset-2 mt-auto" onClick={() => window.open(product.url, '_blank')} tabIndex={0} >
+                    Buy on Amazon </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Card>
 
-                        
+
         {/* DAILY TIPS (unchanged) */}
         <Card className="eco-card fade-in stagger-6 hover-lift">
           <h3 className="text-lg font-semibold mb-4 flex items-center">
