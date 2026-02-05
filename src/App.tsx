@@ -9,7 +9,6 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import Layout from "./components/Layout";
 import EcoHub from "./pages/EcoHub";
 import AirMap from "./pages/AirMap";
-import NatureWatch from "./pages/NatureWatch";
 import GrowGuide from "./pages/GrowGuide";
 import CropDetails from "./pages/CropDetails";
 import PlantCare from "./pages/PlantCare";
@@ -34,7 +33,6 @@ const App = () => (
             <Route path="/" element={<Layout />}>
               <Route index element={<EcoHub />} />
               <Route path="airmap" element={<AirMap />} />
-              <Route path="naturewatch" element={<NatureWatch />} />
               <Route path="growguide" element={<GrowGuide />} />
               <Route path="cropdetails" element={<CropDetails />} />
               <Route path="plantcare" element={<PlantCare />} />
