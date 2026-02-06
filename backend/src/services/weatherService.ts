@@ -50,51 +50,12 @@ const getHealthRecommendation = (aqi: number) => {
 
 export const getAirQualityData = async (lat: number, lon: number) => {
   try {
-    // Use IQAir API for most accurate AQI data
-    const iqairKey = process.env.IQAIR_API_KEY;
-    
-    if (iqairKey && iqairKey !== 'YOUR_IQAIR_API_KEY_HERE') {
-      const iqairUrl = `http://api.airvisual.com/v2/nearest_city?lat=${lat}&lon=${lon}&key=${iqairKey}`;
-      console.log('Fetching air quality from IQAir:', iqairUrl.replace(iqairKey, 'API_KEY'));
-      
-      const iqairResponse = await axios.get(iqairUrl);
-      
-      if (iqairResponse.data?.data?.current?.pollution) {
-        const pollution = iqairResponse.data.data.current.pollution;
-        const aqi = pollution.aqius; // US AQI standard
-        
-        console.log('IQAir pollution data:', {
-          aqi: aqi,
-          mainPollutant: pollution.mainus,
-          city: iqairResponse.data.data.city,
-          timestamp: pollution.ts
-        });
-        
-        return {
-          success: true,
-          data: {
-            aqi: Math.round(aqi),
-            pm25: Math.round(pollution.p2?.aqius || 0),
-            pm10: Math.round(pollution.p1?.aqius || 0),
-            level: getAQILevel(aqi),
-            recommendation: getHealthRecommendation(aqi)
-          }
-        };
-      }
-    } else {
-      console.log('IQAir API key not configured, trying OpenWeather');
-    }
-  } catch (error: any) {
-    console.error('IQAir API failed:', error.response?.data || error.message);
-  }
-  
-  // Fallback to OpenWeather
-  try {
+    // Use OpenWeather Air Pollution API for more accurate AQI
     const apiKey = process.env.OPENWEATHER_API_KEY;
     
     if (apiKey) {
       const owUrl = `http://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey}`;
-      console.log('Fetching air quality from OpenWeather (fallback)');
+      console.log('Fetching air quality from OpenWeather:', owUrl);
       const owResponse = await axios.get(owUrl);
       
       if (owResponse.data?.list?.[0]) {
@@ -108,7 +69,11 @@ export const getAirQualityData = async (lat: number, lon: number) => {
           no2: components.no2
         });
         
+        // Convert OpenWeather AQI (1-5) to US AQI scale (0-500)
+        const owAqi = pollution.main.aqi; // 1-5 scale
         let usAqi;
+        
+        // Convert based on PM2.5 values (more accurate)
         if (components.pm2_5 <= 12) usAqi = Math.round((components.pm2_5 / 12) * 50);
         else if (components.pm2_5 <= 35.4) usAqi = Math.round(50 + ((components.pm2_5 - 12) / 23.4) * 50);
         else if (components.pm2_5 <= 55.4) usAqi = Math.round(100 + ((components.pm2_5 - 35.4) / 20) * 50);
@@ -133,10 +98,10 @@ export const getAirQualityData = async (lat: number, lon: number) => {
       console.log('OpenWeather API key not found in environment');
     }
   } catch (error) {
-    console.error('OpenWeather API failed:', error);
+    console.error('OpenWeather API failed, falling back to Open-Meteo:', error);
   }
   
-  // Final fallback to Open-Meteo
+  // Fallback to Open-Meteo if OpenWeather fails
   console.log('Using Open-Meteo fallback');
   const url =
     `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}` +
@@ -146,6 +111,7 @@ export const getAirQualityData = async (lat: number, lon: number) => {
   
   console.log('Open-Meteo AQI data:', data.current);
   
+  // Use actual values if available, otherwise use conservative estimates
   const aqi = data.current?.us_aqi || 50;
   const pm25 = data.current?.pm2_5 || 12;
   const pm10 = data.current?.pm10 || 20;
