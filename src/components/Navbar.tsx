@@ -39,12 +39,20 @@ const Navbar = () => {
   const navItems = [
     { name: "My Dashboard", path: "/dashboard" },
     { name: "Air Map", path: "/airmap", requiresLocation: true },
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
     { name: "Grow Guide", path: "/growguide" },
     { name: "Plant Care", path: "/plantcare" },
     { name: "Trash Scan", path: "/trashscan" },
     { name: "FarmGuide", path: "/farmguide" },
     { name: "Earth Feed", path: "/earthfeed" },
   ];
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 
   const isActive = (path: string) => location.pathname === path;
 

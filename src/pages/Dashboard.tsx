@@ -167,11 +167,101 @@ const Dashboard = () => {
     plantsGrown: 23,
   };
 
+<<<<<<< Updated upstream
   const ecoTips = [
+=======
+  // Fetch user profile data from Supabase
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('username, created_at')
+        .eq('id', user.id)
+        .single();
+
+      if (data && !error) {
+        setUsername(data.username || user.email?.split('@')[0] || "User");
+
+        // Format the date
+        if (data.created_at) {
+          const date = new Date(data.created_at);
+          const options: Intl.DateTimeFormatOptions = { month: 'long', year: 'numeric' };
+          setMemberSince(date.toLocaleDateString('en-US', options));
+        }
+      }
+    };
+
+    fetchUserProfile();
+  }, [user]);
+
+  // Auto-load weather forecast on mount if location exists
+  useEffect(() => {
+    const loadInitialForecast = async () => {
+      if (lastCoords && !forecast && !loading) {
+        try {
+          setLoading(true);
+          const wfRes = await fetch(
+            `${API_BASE}/api/weather/forecast?lat=${lastCoords.lat}&lon=${lastCoords.lon}`
+          );
+          const wfJson = await wfRes.json();
+
+          const merged: ForecastDay[] = (wfJson.days || []).map(
+            (d: string, i: number) => ({
+              date: d,
+              max: Math.round(wfJson.max[i]),
+              min: Math.round(wfJson.min[i])
+            })
+          ).slice(0, 3);
+
+          setForecast(merged);
+        } catch (err: any) {
+          console.error('Failed to load initial forecast:', err);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadInitialForecast();
+  }, []);
+
+  // -----------------------------
+  // TIPS DATA & LOGIC
+  // -----------------------------
+  const ALL_ECO_TIPS = [
+>>>>>>> Stashed changes
     "Collect rainwater for your garden to save up to 40% on water usage",
     "Companion planting can reduce pest problems by 60%",
-    "Composting kitchen scraps can reduce household waste by 30%"
+    "Composting kitchen scraps can reduce household waste by 30%",
+    "Use a drip irrigation system to deliver water directly to plant roots",
+    "Mulch your garden to retain moisture and suppress weeds",
+    "Choose native plants that are adapted to your local climate",
+    "Install a rain barrel to catch runoff from your roof",
+    "Rotate your crops to prevent soil depletion and pest buildup",
+    "Attract beneficial insects to your garden to control pests naturally",
+    "Use organic fertilizers to nourish your soil without chemicals",
+    "Plant a tree to provide shade and absorb carbon dioxide",
+    "Start a worm bin to turn kitchen waste into nutrient-rich compost",
+    "Avoid using pesticides that harm pollinators like bees and butterflies",
+    "Harvest seeds from your best plants to save money for next season",
+    "Water your garden in the early morning or late evening to reduce evaporation"
   ];
+
+  const [visibleTipsCount, setVisibleTipsCount] = useState(3);
+
+  const visibleTips = ALL_ECO_TIPS.slice(0, visibleTipsCount);
+  const allTipsShown = visibleTipsCount >= ALL_ECO_TIPS.length;
+
+  const handleShowMoreTips = () => {
+    if (allTipsShown) {
+      setVisibleTipsCount(3); // Reset to show less
+      // Optional: scroll back to tips section top?
+    } else {
+      setVisibleTipsCount((prev) => Math.min(prev + 3, ALL_ECO_TIPS.length));
+    }
+  };
 
   const handleQuickAction = (action: string) => {
     switch (action) {
@@ -188,6 +278,7 @@ const Dashboard = () => {
         break;
     }
   };
+
 
   // ============================================================
   // UI (all your previous content kept exactly as it was)
@@ -442,16 +533,16 @@ const Dashboard = () => {
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {ecoTips.map((tip, i) => (
-              <div key={i} className="flex items-start space-x-3 p-3 bg-secondary rounded-lg">
-                <div className="w-2 h-2 bg-primary rounded-full mt-2"></div>
+            {visibleTips.map((tip, i) => (
+              <div key={i} className="flex items-start space-x-3 p-3 bg-secondary rounded-lg fade-in">
+                <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
                 <p className="text-sm">{tip}</p>
               </div>
             ))}
           </div>
 
-          <Button className="w-full mt-4" variant="outline">
-            More Tips
+          <Button className="w-full mt-4" variant="outline" onClick={handleShowMoreTips}>
+            {allTipsShown ? "Show Less" : "More Tips"}
           </Button>
         </Card>
 
