@@ -1,5 +1,5 @@
 import express from "express";
-import { getWeatherForecast, getAirQualityData } from "../services/weatherService.js";
+import { getWeatherForecast, getAirQualityData, getHeatMapData, getPollutionMapData } from "../services/weatherService.js";
 
 const router = express.Router();
 
@@ -24,6 +24,43 @@ router.get("/air", async (req, res) => {
     res.json(data);
   } catch (err) {
     res.status(500).json({ error: "air fetch failed" });
+  }
+});
+
+router.get("/heatmap", async (req, res) => {
+  try {
+    const { lat, lon } = req.query;
+    if (!lat || !lon) return res.status(400).json({ error: "lat & lon required" });
+
+    const data = await getHeatMapData(Number(lat), Number(lon));
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: "heat map fetch failed" });
+  }
+});
+
+router.get("/pollution", async (req, res) => {
+  try {
+    const { lat, lon } = req.query;
+    if (!lat || !lon) return res.status(400).json({ error: "lat & lon required" });
+
+    const data = await getPollutionMapData(Number(lat), Number(lon));
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: "pollution map fetch failed" });
+  }
+});
+
+router.get("/nearby", async (req, res) => {
+  try {
+    const { lat, lon } = req.query;
+    if (!lat || !lon) return res.status(400).json({ error: "lat & lon required" });
+
+    const nearbyService = await import("../services/nearbyService.js");
+    const data = await nearbyService.getNearbyLocations(Number(lat), Number(lon));
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: "nearby fetch failed" });
   }
 });
 
