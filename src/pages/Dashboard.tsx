@@ -12,6 +12,8 @@ import {
   Edit,
   Plus
 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
@@ -51,6 +53,10 @@ const Dashboard = () => {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const { user } = useAuth();
+  const [username, setUsername] = useState("");
+  const [memberSince, setMemberSince] = useState("");
 
   const API_BASE = "http://localhost:5000";
 
@@ -162,14 +168,11 @@ const Dashboard = () => {
   // Static dashboard dummy data (unchanged)
   // -----------------------------
   const userStats = {
-    name: "Sara Chen",
-    joinDate: "March 2024",
+    name: username || "Sara Chen",
+    joinDate: memberSince || "March 2024",
     plantsGrown: 23,
   };
 
-<<<<<<< Updated upstream
-  const ecoTips = [
-=======
   // Fetch user profile data from Supabase
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -231,7 +234,6 @@ const Dashboard = () => {
   // TIPS DATA & LOGIC
   // -----------------------------
   const ALL_ECO_TIPS = [
->>>>>>> Stashed changes
     "Collect rainwater for your garden to save up to 40% on water usage",
     "Companion planting can reduce pest problems by 60%",
     "Composting kitchen scraps can reduce household waste by 30%",
@@ -259,7 +261,7 @@ const Dashboard = () => {
       setVisibleTipsCount(3); // Reset to show less
       // Optional: scroll back to tips section top?
     } else {
-      setVisibleTipsCount((prev) => Math.min(prev + 3, ALL_ECO_TIPS.length));
+      setVisibleTipsCount((prev) => Math.min(prev + 6, ALL_ECO_TIPS.length));
     }
   };
 

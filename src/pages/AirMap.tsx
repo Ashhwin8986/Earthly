@@ -43,7 +43,7 @@ const AirMap = () => {
         setError("");
 
         // 1) AIR QUALITY
-        const aq = await fetch(`${API_BASE}/api/air?lat=${lat}&lon=${lon}`);
+        const aq = await fetch(`${API_BASE}/api/weather/air?lat=${lat}&lon=${lon}`);
         const aqJson = await aq.json();
         if (!aqJson.success) throw new Error("Air quality fetch failed");
 
