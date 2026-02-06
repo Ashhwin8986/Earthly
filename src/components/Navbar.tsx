@@ -36,15 +36,16 @@ const Navbar = () => {
     return () => observer.disconnect();
   }, [isLandingPage]);
 
-  const navItems = [
-    { name: "My Dashboard", path: "/dashboard" },
-    { name: "Air Map", path: "/airmap", requiresLocation: true },
-    { name: "Grow Guide", path: "/growguide" },
-    { name: "Plant Care", path: "/plantcare" },
-    { name: "Trash Scan", path: "/trashscan" },
-    { name: "FarmGuide", path: "/farmguide" },
-    { name: "Earth Feed", path: "/earthfeed" },
-  ];
+const navItems = [
+  { name: "My Dashboard", path: "/dashboard" },
+  { name: "Air Map", path: "/airmap", requiresLocation: true },
+  { name: "Nature Watch", path: "/naturewatch" },
+  { name: "Grow Guide", path: "/growguide" },
+  { name: "Plant Care", path: "/plantcare" },
+  { name: "Trash Scan", path: "/trashscan" },
+  { name: "FarmGuide", path: "/farmguide" },
+  { name: "Earth Feed", path: "/earthfeed" },
+];
 
   const isActive = (path: string) => location.pathname === path;
 
