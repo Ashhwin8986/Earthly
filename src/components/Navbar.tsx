@@ -38,12 +38,7 @@ const Navbar = () => {
 
   const navItems = [
     { name: "My Dashboard", path: "/dashboard" },
-<<<<<<< HEAD
-    { name: "Air Map", path: "/airmap" },
-=======
     { name: "Air Map", path: "/airmap", requiresLocation: true },
-    { name: "Nature Watch", path: "/naturewatch" },
->>>>>>> b3f57f6 (Recovered changes onto aditi-api-v2)
     { name: "Grow Guide", path: "/growguide" },
     { name: "Plant Care", path: "/plantcare" },
     { name: "Trash Scan", path: "/trashscan" },
@@ -62,7 +57,7 @@ const Navbar = () => {
       e.preventDefault();
       const savedCoords = localStorage.getItem("lastCoords");
       const savedLocation = localStorage.getItem("userLocation");
-      
+
       if (savedCoords && savedLocation) {
         const coords = JSON.parse(savedCoords);
         window.location.href = `/airmap?lat=${coords.lat}&lon=${coords.lon}&place=${encodeURIComponent(savedLocation)}`;
