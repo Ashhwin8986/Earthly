@@ -47,6 +47,7 @@ const navItems = [
   { name: "Earth Feed", path: "/earthfeed" },
 ];
 
+
   const isActive = (path: string) => location.pathname === path;
 
   const getInitials = (email: string) => {
