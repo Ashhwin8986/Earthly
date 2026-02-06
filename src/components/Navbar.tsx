@@ -36,7 +36,7 @@ const Navbar = () => {
     return () => observer.disconnect();
   }, [isLandingPage]);
 
- const navItems = [
+const navItems = [
   { name: "My Dashboard", path: "/dashboard" },
   { name: "Air Map", path: "/airmap", requiresLocation: true },
   { name: "Nature Watch", path: "/naturewatch" },
@@ -59,7 +59,7 @@ const Navbar = () => {
       e.preventDefault();
       const savedCoords = localStorage.getItem("lastCoords");
       const savedLocation = localStorage.getItem("userLocation");
-      
+
       if (savedCoords && savedLocation) {
         const coords = JSON.parse(savedCoords);
         window.location.href = `/airmap?lat=${coords.lat}&lon=${coords.lon}&place=${encodeURIComponent(savedLocation)}`;
