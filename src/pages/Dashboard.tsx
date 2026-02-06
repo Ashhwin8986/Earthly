@@ -15,6 +15,8 @@ import {
 
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 type ForecastDay = {
   date: string;
@@ -25,6 +27,11 @@ type ForecastDay = {
 const Dashboard = () => {
   const navigate = useNavigate();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const { user } = useAuth();
+
+  // User profile data
+  const [username, setUsername] = useState<string>("User");
+  const [memberSince, setMemberSince] = useState<string>("Recently");
 
   // -----------------------------
   // STATE (persistent via localStorage)
@@ -159,13 +166,68 @@ const Dashboard = () => {
   };
 
   // -----------------------------
-  // Static dashboard dummy data (unchanged)
+  // User statistics
   // -----------------------------
   const userStats = {
-    name: "Sara Chen",
-    joinDate: "March 2024",
     plantsGrown: 23,
   };
+
+  // Fetch user profile data from Supabase
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('username, created_at')
+        .eq('id', user.id)
+        .single();
+
+      if (data && !error) {
+        setUsername(data.username || user.email?.split('@')[0] || "User");
+        
+        // Format the date
+        if (data.created_at) {
+          const date = new Date(data.created_at);
+          const options: Intl.DateTimeFormatOptions = { month: 'long', year: 'numeric' };
+          setMemberSince(date.toLocaleDateString('en-US', options));
+        }
+      }
+    };
+
+    fetchUserProfile();
+  }, [user]);
+
+  // Auto-load weather forecast on mount if location exists
+  useEffect(() => {
+    const loadInitialForecast = async () => {
+      if (lastCoords && !forecast && !loading) {
+        try {
+          setLoading(true);
+          const wfRes = await fetch(
+            `${API_BASE}/api/weather/forecast?lat=${lastCoords.lat}&lon=${lastCoords.lon}`
+          );
+          const wfJson = await wfRes.json();
+
+          const merged: ForecastDay[] = (wfJson.days || []).map(
+            (d: string, i: number) => ({
+              date: d,
+              max: Math.round(wfJson.max[i]),
+              min: Math.round(wfJson.min[i])
+            })
+          ).slice(0, 3);
+
+          setForecast(merged);
+        } catch (err: any) {
+          console.error('Failed to load initial forecast:', err);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadInitialForecast();
+  }, []);
 
   const ecoTips = [
     "Collect rainwater for your garden to save up to 40% on water usage",
@@ -216,9 +278,9 @@ const Dashboard = () => {
               </div>
               <div className="flex-1">
 
-                <h3 className="text-xl font-semibold mb-1">{userStats.name}</h3>
+                <h3 className="text-xl font-semibold mb-1">{username}</h3>
                 <p className="text-sm text-muted-foreground mb-3">
-                  Member since {userStats.joinDate}
+                  Member since {memberSince}
                 </p>
 
                 {/* LOCATION */}
