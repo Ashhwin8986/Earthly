@@ -38,7 +38,12 @@ const Navbar = () => {
 
   const navItems = [
     { name: "My Dashboard", path: "/dashboard" },
+<<<<<<< HEAD
     { name: "Air Map", path: "/airmap" },
+=======
+    { name: "Air Map", path: "/airmap", requiresLocation: true },
+    { name: "Nature Watch", path: "/naturewatch" },
+>>>>>>> b3f57f6 (Recovered changes onto aditi-api-v2)
     { name: "Grow Guide", path: "/growguide" },
     { name: "Plant Care", path: "/plantcare" },
     { name: "Trash Scan", path: "/trashscan" },
@@ -50,6 +55,22 @@ const Navbar = () => {
 
   const getInitials = (email: string) => {
     return email.substring(0, 2).toUpperCase();
+  };
+
+  const handleNavClick = (e: React.MouseEvent, item: typeof navItems[0]) => {
+    if (item.requiresLocation) {
+      e.preventDefault();
+      const savedCoords = localStorage.getItem("lastCoords");
+      const savedLocation = localStorage.getItem("userLocation");
+      
+      if (savedCoords && savedLocation) {
+        const coords = JSON.parse(savedCoords);
+        window.location.href = `/airmap?lat=${coords.lat}&lon=${coords.lon}&place=${encodeURIComponent(savedLocation)}`;
+      } else {
+        // Redirect to dashboard to select a location first
+        window.location.href = "/dashboard";
+      }
+    }
   };
 
   return (
@@ -110,6 +131,7 @@ const Navbar = () => {
                   <Link
                     key={item.name}
                     to={item.path}
+                    onClick={(e) => handleNavClick(e, item)}
                     className={cn(
                       "px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200 hover-scale",
                       isActive(item.path)
@@ -187,7 +209,10 @@ const Navbar = () => {
                   <Link
                     key={item.name}
                     to={item.path}
-                    onClick={() => setIsOpen(false)}
+                    onClick={(e) => {
+                      handleNavClick(e, item);
+                      setIsOpen(false);
+                    }}
                     className={cn(
                       "block px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 hover-scale",
                       isActive(item.path)
