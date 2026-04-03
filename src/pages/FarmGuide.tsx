@@ -20,6 +20,8 @@ interface CropRecommendation {
   season: string;
   rainfall: string;
   irrigation: string;
+  temperature?: number;
+  rainfallValue?: number;
 }
 
 interface YieldResult {
@@ -40,53 +42,6 @@ const FarmGuide = () => {
   const [yieldResult, setYieldResult] = useState<YieldResult | null>(null); // FIXED: Added type
   const [unit, setUnit] = useState("meters"); // ✅ FIXED
 
-  // Crop recommendation database (rule-based logic)
-  const cropDatabase: Record<string, any> = {
-    'Black Soil': {
-      'Kharif': {
-        'High': ['Cotton', 'Soybean', 'Groundnut'],
-        'Medium': ['Jowar', 'Bajra', 'Maize'],
-        'Low': ['Pulses', 'Bajra']
-      },
-      'Rabi': {
-        'Available': ['Wheat', 'Gram', 'Mustard'],
-        'Not Available': ['Gram', 'Lentils']
-      }
-    },
-    'Red Soil': {
-      'Kharif': {
-        'High': ['Rice', 'Groundnut', 'Cotton'],
-        'Medium': ['Groundnut', 'Maize', 'Ragi'],
-        'Low': ['Pulses', 'Ragi']
-      },
-      'Rabi': {
-        'Available': ['Wheat', 'Gram', 'Tobacco'],
-        'Not Available': ['Gram', 'Oilseeds']
-      }
-    },
-    'Alluvial Soil': {
-      'Kharif': {
-        'High': ['Rice', 'Sugarcane', 'Jute'],
-        'Medium': ['Rice', 'Maize', 'Cotton'],
-        'Low': ['Maize', 'Pulses']
-      },
-      'Rabi': {
-        'Available': ['Wheat', 'Mustard', 'Potato'],
-        'Not Available': ['Wheat', 'Barley']
-      }
-    },
-    'Clay Soil': {
-      'Kharif': {
-        'High': ['Rice', 'Wheat', 'Sugarcane'],
-        'Medium': ['Cotton', 'Wheat'],
-        'Low': ['Pulses']
-      },
-      'Rabi': {
-        'Available': ['Wheat', 'Barley'],
-        'Not Available': ['Gram', 'Barley']
-      }
-    }
-  };
 
   // Base yield derived from DES Normal Estimates (2016–17 to 2020–21)
   const baseYield: Record<string, number> = {
@@ -152,32 +107,7 @@ const FarmGuide = () => {
   };
 
 
-  // Recommend crop based on parameters
-  const recommendCrop = (soilType: string, season: string, rainfall: string, irrigation: string) => {
-    try {
-      const soilData = cropDatabase[soilType];
-      let crops: string[] = [];
-
-      if (season === 'Kharif') {
-        crops = soilData['Kharif'][rainfall] || soilData['Kharif']['Medium'];
-      } else if (season === 'Rabi') {
-        crops = soilData['Rabi'][irrigation] || soilData['Rabi']['Available'];
-      } else {
-        crops = ['Watermelon', 'Cucumber', 'Vegetables'];
-      }
-
-      return {
-        recommended: crops[0],
-        alternatives: crops.slice(1, 3)
-      };
-    } catch (error) {
-      return {
-        recommended: 'Wheat',
-        alternatives: ['Rice', 'Maize']
-      };
-    }
-  };
-
+  // 🔄 UPDATED HYBRID MODEL
   const calculateYield = (
     crop: string,
     soilType: string,
@@ -185,21 +115,56 @@ const FarmGuide = () => {
     width: number,
     unit: string,
     irrigation: string,
-    rainfall: string
+    rainfallCategory: string,   // still used for UI
+    rainfallValue: number,      // actual mm
+    temperature: number
   ): YieldResult => {
 
-    let areaHectares =
-      unit === "meters" ? (length * width) / 10000 :
-        unit === "feet" ? (length * width) / 107639 :
-          length;
+    // ✅ FIXED: Proper area conversion
+    let areaHectares;
+
+    if (unit === "meters") {
+      areaHectares = (length * width) / 10000; // m² → hectares
+    } else if (unit === "feet") {
+      areaHectares = (length * width) / 107639; // ft² → hectares
+    } else if (unit === "acres") {
+      areaHectares = length * 0.4047; // ✅ acres → hectares
+    } else {
+      areaHectares = 0;
+    }
 
     const base = baseYield[crop] ?? 20;
     const soilAdj = soilFactor[soilType] ?? 1.0;
     const irrAdj = irrigationFactor[irrigation] ?? 1.0;
-    const rainAdj = rainfallFactor[rainfall] ?? 1.0;
 
-    const yieldPerHectare = Math.min(base * soilAdj * irrAdj * rainAdj, base * 1.5);
+    // ✅ Continuous rainfall factor
+    const rainAdj = 1 + (rainfallValue / 300);
+
+    // ✅ Temperature factor
+    let tempAdj = 1.0;
+    if (temperature < 15) tempAdj = 0.8;
+    else if (temperature < 25) tempAdj = 1.0;
+    else if (temperature < 35) tempAdj = 1.1;
+    else tempAdj = 0.9;
+
+    // ✅ Final yield formula
+    const yieldPerHectare = Math.min(
+      base * soilAdj * irrAdj * rainAdj * tempAdj,
+      base * 1.8
+    );
+
     const totalYield = yieldPerHectare * areaHectares;
+
+    console.log("DEBUG INPUTS:", {
+      crop,
+      soilType,
+      length,
+      width,
+      unit,
+      irrigation,
+      rainfallValue,
+      temperature
+    });
 
     return {
       areaHectares,
@@ -211,6 +176,62 @@ const FarmGuide = () => {
     };
   };
 
+  const getCropRecommendation = async (imageFile: File, location: string) => {
+    const formData = new FormData();
+    formData.append("image", imageFile);
+    formData.append("location", location);
+
+    const response = await fetch("http://127.0.0.1:5000/recommend", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error("Crop recommendation failed");
+    }
+
+    const data = await response.json();
+    return data;
+  };
+
+  // const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = event.target.files?.[0];
+  //   if (!file) return;
+
+  //   setCurrentScreen("analyzing");
+
+  //   const reader = new FileReader();
+  //   reader.onload = e => setUploadedImage(e.target?.result as string);
+  //   reader.readAsDataURL(file);
+
+  //   try {
+  //     // You must have location stored somewhere
+  //     const location = localStorage.getItem("userLocation") || "Delhi";
+
+  //     const result = await getCropRecommendation(file, location);
+
+  //     setSoilClassification({
+  //       soilType: result.soil_type,
+  //       confidence: 0 // backend already filtered, confidence optional
+  //     });
+
+  //     setCropRecommendation({
+  //       recommended: result.recommended_crop,
+  //       alternatives: result.top_5_crops.slice(1, 3),
+  //       season: "",
+  //       rainfall: "",
+  //       irrigation: ""
+  //     });
+
+  //     setCurrentScreen("results");
+
+  //   } catch (err) {
+  //     alert("Recommendation failed. Check backend.");
+  //     resetAll();
+  //   }
+  // };
+
+  // 🔄 UPDATED
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -222,24 +243,58 @@ const FarmGuide = () => {
     reader.readAsDataURL(file);
 
     try {
-      const soilResult = await classifySoil(file);
-      setSoilClassification(soilResult);
+      const location = localStorage.getItem("userLocation") || "Delhi";
 
-      const season = getCurrentSeason();
-      const rainfall = "Medium";
-      const irrigation = "Available";
+      const result = await getCropRecommendation(file, location);
 
-      const cropRec = recommendCrop(soilResult.soilType, season, rainfall, irrigation);
-      setCropRecommendation({ ...cropRec, season, rainfall, irrigation });
+      setSoilClassification({
+        soilType: result.soil_type,
+        confidence: 0
+      });
+
+      setCropRecommendation({
+        recommended: result.recommended_crop,
+        alternatives: result.top_5_crops.slice(1, 3),
+        season: "",
+        rainfall: "",
+        irrigation: "",
+
+        temperature: result.temperature,     // ✅ NEW
+        rainfallValue: result.rainfall       // ✅ NEW (numeric mm)
+      });
 
       setCurrentScreen("results");
+
     } catch (err) {
-      alert("Soil classification failed. Please try another image.");
+      alert("Recommendation failed. Check backend.");
       resetAll();
     }
   };
 
   // Handle yield calculation
+  // const handleYieldCalculation = ({
+  //   length,
+  //   width
+  // }: {
+  //   length: string;
+  //   width: string;
+  // }) => {
+  //   if (!cropRecommendation || !soilClassification) return;
+
+  //   setYieldResult(
+  //     calculateYield(
+  //       cropRecommendation.recommended,
+  //       soilClassification.soilType,
+  //       parseFloat(length),
+  //       parseFloat(width),
+  //       unit,
+  //       cropRecommendation.irrigation,
+  //       cropRecommendation.rainfall
+  //     )
+  //   );
+  // };
+
+  // 🔄 UPDATED
   const handleYieldCalculation = ({
     length,
     width
@@ -257,7 +312,9 @@ const FarmGuide = () => {
         parseFloat(width),
         unit,
         cropRecommendation.irrigation,
-        cropRecommendation.rainfall
+        cropRecommendation.rainfall,
+        cropRecommendation.rainfallValue ?? 0,   // ✅ NEW
+        cropRecommendation.temperature ?? 25     // ✅ NEW
       )
     );
   };
@@ -550,7 +607,10 @@ const FarmGuide = () => {
 
                     <div>
                       <Label htmlFor="unit">Unit</Label>
-                      <Select name="unit" defaultValue="meters">
+                      <Select
+                        value={unit}
+                        onValueChange={(value) => setUnit(value)}
+                      >
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>

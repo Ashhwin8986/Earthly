@@ -16,6 +16,10 @@ CLASS_NAMES = [
     "Alluvial Soil", "Black Soil", "Clay Soil", "Red Soil"
 ]
 
+@app.route("/", methods=["GET"])
+def home():
+    return "Backend is running!"
+
 @app.route("/predict-soil", methods=["POST"])
 def predict_soil():
     print("=" * 50)
