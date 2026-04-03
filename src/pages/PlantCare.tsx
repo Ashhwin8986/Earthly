@@ -30,13 +30,41 @@ const PlantCare = () => {
     ]
   };
 
-  const handleImageUpload = () => {
+  const handleImageUpload = async (file: File) => {
     setIsAnalyzing(true);
-    // Simulate analysis
-    setTimeout(() => {
-      setAnalysisResult(sampleAnalysis);
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const res = await fetch("http://localhost:5001/analyze-plant", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      setAnalysisResult({
+        plantType: data.plantType,
+        healthScore: data.healthScore,
+        issues: data.status === "Healthy"
+          ? []
+          : [
+            {
+              name: data.status,
+              severity: "Medium",
+              description: "Detected via AI analysis"
+            }
+          ],
+        recommendations: sampleAnalysis.recommendations,
+        careSchedule: sampleAnalysis.careSchedule
+      });
+
+    } catch (err) {
+      console.error("Prediction failed", err);
+    } finally {
       setIsAnalyzing(false);
-    }, 3000);
+    }
   };
 
   const getSeverityColor = (severity: string) => {
@@ -78,7 +106,22 @@ const PlantCare = () => {
                   <p className="text-sm text-muted-foreground mb-4">
                     Drag and drop an image here, or click to browse
                   </p>
-                  <Button onClick={handleImageUpload} className="bg-gradient-primary">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    hidden
+                    id="plant-upload"
+                    onChange={(e) => {
+                      if (e.target.files?.[0]) {
+                        handleImageUpload(e.target.files[0]);
+                      }
+                    }}
+                  />
+
+                  <Button
+                    onClick={() => document.getElementById("plant-upload")?.click()}
+                    className="bg-gradient-primary"
+                  >
                     Choose Image
                   </Button>
                 </div>
