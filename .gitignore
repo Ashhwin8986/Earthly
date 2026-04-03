@@ -28,3 +28,4 @@ ml_backend/SoilNet.h5
 
 *.h5
 *.keras
+.qoder/

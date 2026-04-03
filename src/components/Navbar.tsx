@@ -39,6 +39,7 @@ const Navbar = () => {
 const navItems = [
   { name: "My Dashboard", path: "/dashboard" },
   { name: "Air Map", path: "/airmap", requiresLocation: true },
+  { name: "Nature Watch", path: "/naturewatch" },
   { name: "Grow Guide", path: "/growguide" },
   { name: "Plant Care", path: "/plantcare" },
   { name: "Trash Scan", path: "/trashscan" },
