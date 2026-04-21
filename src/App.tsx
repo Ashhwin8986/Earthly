@@ -12,7 +12,6 @@ import AirMap from "./pages/AirMap";
 import GrowGuide from "./pages/GrowGuide";
 import CropDetails from "./pages/CropDetails";
 import PlantCare from "./pages/PlantCare";
-import TrashScan from "./pages/TrashScan";
 import EarthFeed from "./pages/EarthFeed";
 import FarmGuide from "./pages/FarmGuide";
 import Dashboard from "./pages/Dashboard";
@@ -36,7 +35,6 @@ const App = () => (
               <Route path="growguide" element={<GrowGuide />} />
               <Route path="cropdetails" element={<CropDetails />} />
               <Route path="plantcare" element={<PlantCare />} />
-              <Route path="trashscan" element={<TrashScan />} />
               <Route path="earthfeed" element={<EarthFeed />} />
               <Route path="farmguide" element={<FarmGuide />} />
               <Route path="dashboard" element={
