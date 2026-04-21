@@ -229,10 +229,36 @@ const Dashboard = () => {
     loadInitialForecast();
   }, []);
 
+  const [visibleTips, setVisibleTips] = useState(3);
+  const ecoTipsScrollRef = useRef<HTMLDivElement>(null);
+
+  const scrollTips = (direction: 'left' | 'right') => {
+    if (ecoTipsScrollRef.current) {
+      const scrollAmount = 280;
+      const newScroll = direction === 'left'
+        ? ecoTipsScrollRef.current.scrollLeft - scrollAmount
+        : ecoTipsScrollRef.current.scrollLeft + scrollAmount;
+      
+      ecoTipsScrollRef.current.scrollTo({
+        left: newScroll,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   const ecoTips = [
-    "Collect rainwater for your garden to save up to 40% on water usage",
-    "Companion planting can reduce pest problems by 60%",
-    "Composting kitchen scraps can reduce household waste by 30%"
+    "Collect rainwater for your garden to save 40% water",
+    "Use companion planting to naturally reduce pests",
+    "Compost kitchen scraps to cut household waste",
+    "Plant native species to support local wildlife",
+    "Use organic mulch to retain soil moisture",
+    "Rotate crops yearly to maintain soil health",
+    "Start a worm bin for quick composting",
+    "Install drip irrigation to save water",
+    "Grow herbs indoors for year-round freshness",
+    "Use coffee grounds as natural fertilizer",
+    "Plant trees to reduce carbon footprint",
+    "Recycle garden waste into nutrient-rich compost"
   ];
 
   const handleQuickAction = (action: string) => {
@@ -322,11 +348,6 @@ const Dashboard = () => {
                       </div>
                     )}
                   </div>
-
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Plants Grown</span>
-                    <span className="text-sm font-medium">{userStats.plantsGrown}</span>
-                  </div>
                 </div>
 
                 {error && (
@@ -337,43 +358,61 @@ const Dashboard = () => {
             </div>
           </Card>
 
-          {/* WEATHER CARD (LIVE FORECAST) */}
+          {/* ECO TIPS CARD */}
           <Card className="eco-card fade-in stagger-3 hover-lift">
-            <h3 className="text-lg font-semibold mb-4 flex items-center">
-              <Sun className="h-5 w-5 mr-2 text-accent" />
-              3-Day Weather Forecast
-            </h3>
-
-            {loading && <div>Loading...</div>}
-
-            {!forecast && !loading && (
-              <div className="text-sm text-muted-foreground">
-                Search a location to load forecast.
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold flex items-center">
+                <Lightbulb className="h-5 w-5 mr-2 text-accent" />
+                Daily Eco Tips
+              </h3>
+              <div className="flex space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 w-8 p-0"
+                  onClick={() => scrollTips('left')}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="m15 18-6-6 6-6"/>
+                  </svg>
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 w-8 p-0"
+                  onClick={() => scrollTips('right')}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="m9 18 6-6-6-6"/>
+                  </svg>
+                </Button>
               </div>
-            )}
-
-            {forecast && (
-              <div className="space-y-3">
-                {forecast.map((d) => (
-                  <div key={d.date} className="flex items-center justify-between p-2 bg-secondary/50 rounded-lg">
-                    <div className="flex items-center space-x-3">
-                      <Sun className="h-4 w-4 text-accent" />
-                      <span className="text-sm font-medium">{d.date}</span>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-sm font-semibold">{d.max}°C</div>
-                      <div className="text-xs text-muted-foreground">min {d.min}°C</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <div className="mt-4">
-              <Button onClick={gotoAirmap} disabled={loading}>
-                Check Air Quality
-              </Button>
             </div>
+
+            <div 
+              ref={ecoTipsScrollRef}
+              className="flex space-x-3 overflow-x-auto pb-2 scrollbar-hide snap-x"
+              style={{ scrollBehavior: 'smooth' }}
+            >
+              {ecoTips.slice(0, visibleTips).map((tip, i) => (
+                <div key={i} className="flex-shrink-0 w-64 snap-start">
+                  <div className="flex items-start space-x-3 p-3 bg-secondary rounded-lg h-full">
+                    <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                    <p className="text-sm leading-relaxed line-clamp-2">{tip}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {visibleTips < ecoTips.length && (
+              <Button 
+                className="w-full mt-4" 
+                variant="outline"
+                onClick={() => setVisibleTips(prev => Math.min(prev + 3, ecoTips.length))}
+              >
+                Load More Tips
+              </Button>
+            )}
           </Card>
         </div>
 
@@ -495,27 +534,6 @@ const Dashboard = () => {
           </div>
         </Card>
 
-
-        {/* DAILY TIPS (unchanged) */}
-        <Card className="eco-card fade-in stagger-6 hover-lift">
-          <h3 className="text-lg font-semibold mb-4 flex items-center">
-            <Lightbulb className="h-5 w-5 mr-2 text-accent" />
-            Daily Eco Tips
-          </h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {ecoTips.map((tip, i) => (
-              <div key={i} className="flex items-start space-x-3 p-3 bg-secondary rounded-lg">
-                <div className="w-2 h-2 bg-primary rounded-full mt-2"></div>
-                <p className="text-sm">{tip}</p>
-              </div>
-            ))}
-          </div>
-
-          <Button className="w-full mt-4" variant="outline">
-            More Tips
-          </Button>
-        </Card>
 
       </div>
     </div>
