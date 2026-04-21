@@ -26,7 +26,6 @@ const AirMap = () => {
 
   const [airQualityData, setAirQualityData] = useState<any | null>(null);
   const [weatherData, setWeatherData] = useState<any | null>(null);
-  const [nearbyStations, setNearbyStations] = useState<NearbyLocation[]>([]);
   const [error, setError] = useState("");
   const [showHeatMap, setShowHeatMap] = useState(false);
   const [showPollutionMap, setShowPollutionMap] = useState(false);
@@ -156,14 +155,6 @@ const AirMap = () => {
         windSpeed: wfJson.today.wind,
         visibility: wfJson.today.visibility || 8
       });
-
-      // 3) NEARBY LOCATIONS WITH WEATHER FORECAST
-      const near = await fetch(`${API_BASE}/api/weather/nearby?lat=${lat}&lon=${lon}`);
-      const nearJson = await near.json();
-
-      if (nearJson.success && nearJson.data) {
-        setNearbyStations(nearJson.data);
-      }
     } catch (err: any) {
       setError(err.message || "Something went wrong");
     }
@@ -285,47 +276,6 @@ const AirMap = () => {
                 </div>
               </Card>
             )}
-
-            {/* Nearby Locations */}
-            <Card className="eco-card fade-in stagger-5 hover-lift">
-              <h3 className="text-lg font-semibold mb-4">Nearby Locations</h3>
-
-              <div className="space-y-3">
-                {nearbyStations.map((st, i) => (
-                  <div key={i} className="p-3 rounded-lg bg-secondary">
-                    <div className="flex items-center justify-between mb-2">
-                      <div>
-                        <div className="font-medium">{st.name}</div>
-                        <div className="text-sm text-muted-foreground">{st.distance} km away</div>
-                      </div>
-                      <div className="text-right">
-                        <div className="font-bold">{st.aqi}</div>
-                        <div className={`text-xs px-2 py-1 rounded text-white ${getAQIColor(st.aqi)}`}>
-                          {getAQILevel(st.aqi)}
-                        </div>
-                      </div>
-                    </div>
-                    {st.forecast && st.forecast.length > 0 && (
-                      <div className="mt-2 pt-2 border-t border-border/50">
-                        <div className="text-xs text-muted-foreground mb-1 flex items-center">
-                          <Cloud className="h-3 w-3 mr-1" />
-                          3-Day Forecast
-                        </div>
-                        <div className="grid grid-cols-3 gap-2">
-                          {st.forecast.map((day, idx) => (
-                            <div key={idx} className="text-xs">
-                              <div className="text-muted-foreground">{new Date(day.date).toLocaleDateString('en-US', { weekday: 'short' })}</div>
-                              <div className="font-medium">{day.max}°/{day.min}°</div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-
-            </Card>
 
           </div>
         </div>
