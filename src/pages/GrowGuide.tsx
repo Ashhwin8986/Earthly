@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Calendar, Thermometer, Cloud, Sun, Sprout, Droplets, Lightbulb } from "lucide-react";
+import { useState } from "react";
+import { Calendar, Sprout, Droplets, Lightbulb } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -62,13 +62,6 @@ const GrowGuide = () => {
     retry: 3,
     retryDelay: 1000,
   });
-
-  const weatherInfo = {
-    temperature: "18°C",
-    conditions: "Partly Cloudy",
-    humidity: "65%",
-    rainfall: "12mm"
-  };
 
   const handleViewDetails = (crop: Crop) => {
     // Navigate to crop details with crop data as state
@@ -147,44 +140,6 @@ const GrowGuide = () => {
             Your personalized crop calendar and planting guide
           </p>
         </div>
-
-        {/* Current Weather - Top */}
-        <Card className="eco-card mb-8 fade-in stagger-2 hover-lift">
-          <h3 className="text-lg font-semibold mb-4 flex items-center">
-            <Cloud className="h-5 w-5 mr-2 text-accent" />
-            Current Weather
-          </h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div className="flex items-center space-x-3">
-              <Thermometer className="h-6 w-6 text-accent" />
-              <div>
-                <div className="text-sm text-muted-foreground">Temperature</div>
-                <div className="font-semibold text-lg">{weatherInfo.temperature}</div>
-              </div>
-            </div>
-            <div className="flex items-center space-x-3">
-              <Sun className="h-6 w-6 text-accent" />
-              <div>
-                <div className="text-sm text-muted-foreground">Conditions</div>
-                <div className="font-semibold text-lg">{weatherInfo.conditions}</div>
-              </div>
-            </div>
-            <div className="flex items-center space-x-3">
-              <Droplets className="h-6 w-6 text-accent" />
-              <div>
-                <div className="text-sm text-muted-foreground">Humidity</div>
-                <div className="font-semibold text-lg">{weatherInfo.humidity}</div>
-              </div>
-            </div>
-            <div className="flex items-center space-x-3">
-              <Cloud className="h-6 w-6 text-accent" />
-              <div>
-                <div className="text-sm text-muted-foreground">Rainfall</div>
-                <div className="font-semibold text-lg">{weatherInfo.rainfall}</div>
-              </div>
-            </div>
-          </div>
-        </Card>
 
         {/* Month Selector */}
         <Card className="eco-card mb-8 fade-in stagger-3 hover-lift">
