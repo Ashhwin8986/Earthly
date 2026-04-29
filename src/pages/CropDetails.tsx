@@ -21,7 +21,6 @@ interface Crop {
 const CropDetails = () => {
   const navigate = useNavigate();
   const location = useLocation();
-
   // Get crop data from navigation state or use fallback
   const cropData = location.state?.crop || {
     crop_name: "Tomatoes",

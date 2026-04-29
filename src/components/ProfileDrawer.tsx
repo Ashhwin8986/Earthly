@@ -74,24 +74,20 @@ const ProfileDrawer = ({ isOpen, onClose }: ProfileDrawerProps) => {
               </Button>
             </DrawerClose>
             <DrawerTitle className="sr-only">Profile</DrawerTitle>
-
             {/* Profile Picture */}
             <div className="flex justify-center mb-4">
               <div className="h-20 w-20 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-2xl font-bold shadow-lg">
                 {getInitials(user.email || "")}
               </div>
             </div>
-
             {/* Username */}
             <h2 className="text-xl font-bold text-foreground mb-1">
               {user.email?.split('@')[0] || "User"}
             </h2>
-
             {/* Member Since */}
             <p className="text-sm text-muted-foreground mb-3">
               Member since {getMemberSince()}
             </p>
-
             {/* Bio */}
             <p className="text-sm text-foreground/80 max-w-xs mx-auto leading-relaxed">
               Passionate about environmental conservation and sustainable living.
@@ -161,7 +157,6 @@ const ProfileDrawer = ({ isOpen, onClose }: ProfileDrawerProps) => {
                 <User className="h-4 w-4 text-primary" />
                 <h3 className="font-semibold">Account Settings</h3>
               </div>
-
               <div className="space-y-3 pl-6">
                 <div>
                   <Label htmlFor="username">Username</Label>

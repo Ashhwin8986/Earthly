@@ -53,7 +53,6 @@ const EcoHub = () => {
           style={{ backgroundImage: `url(${heroImage})` }}
         />
         <div className="absolute inset-0 bg-gradient-to-br from-primary/40 via-transparent to-accent/20 " />
-
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 fade-in">
             Tracking Nature's
