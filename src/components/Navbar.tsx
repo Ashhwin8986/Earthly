@@ -36,7 +36,6 @@ const Navbar = () => {
     return () => observer.disconnect();
   }, [isLandingPage]);
 
-<<<<<<< HEAD
 const navItems = [
   { name: "My Dashboard", path: "/dashboard" },
   { name: "Air Map", path: "/airmap", requiresLocation: true },
@@ -46,18 +45,7 @@ const navItems = [
   { name: "Earth Feed", path: "/earthfeed" },
 ];
 
-=======
-  const navItems = [
-    { name: "My Dashboard", path: "/dashboard" },
-    { name: "Air Map", path: "/airmap" },
-    { name: "Nature Watch", path: "/naturewatch" },
-    { name: "Grow Guide", path: "/growguide" },
-    { name: "Plant Care", path: "/plantcare" },
-    { name: "Trash Scan", path: "/trashscan" },
-    { name: "FarmGuide", path: "/farmguide" },
-    { name: "Earth Feed", path: "/earthfeed" },
-  ];
->>>>>>> 296181e207082c4565e1c682ea8f4a44d77b208e
+
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -65,7 +53,6 @@ const navItems = [
     return email.substring(0, 2).toUpperCase();
   };
 
-<<<<<<< HEAD
   const handleNavClick = (e: React.MouseEvent, item: typeof navItems[0]) => {
     if (item.requiresLocation) {
       e.preventDefault();
@@ -82,8 +69,7 @@ const navItems = [
     }
   };
 
-=======
->>>>>>> 296181e207082c4565e1c682ea8f4a44d77b208e
+
   return (
     <>
       <nav
@@ -96,11 +82,10 @@ const navItems = [
             : "bg-background border-b border-border/20"
         )}
       >
-<<<<<<< HEAD
         <div className="max-w-5xl mx-auto px-4 md:px-0">
-=======
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
->>>>>>> 296181e207082c4565e1c682ea8f4a44d77b208e
+
+        <div className="max-w-5xl mx-auto px-4 md:px-0">
+
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-3 group">
@@ -146,14 +131,14 @@ const navItems = [
                   <Link
                     key={item.name}
                     to={item.path}
-<<<<<<< HEAD
                     onClick={(e) => handleNavClick(e, item)}
                     className={cn(
                       "px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200 hover-scale",
-=======
+
+                    onClick={(e) => handleNavClick(e, item)}
                     className={cn(
-                      "px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover-scale",
->>>>>>> 296181e207082c4565e1c682ea8f4a44d77b208e
+                      "px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200 hover-scale",
+
                       isActive(item.path)
                         ? "bg-primary text-primary-foreground shadow-sm"
                         : "text-foreground hover:bg-secondary hover:text-secondary-foreground"
@@ -229,14 +214,11 @@ const navItems = [
                   <Link
                     key={item.name}
                     to={item.path}
-<<<<<<< HEAD
                     onClick={(e) => {
                       handleNavClick(e, item);
                       setIsOpen(false);
                     }}
-=======
-                    onClick={() => setIsOpen(false)}
->>>>>>> 296181e207082c4565e1c682ea8f4a44d77b208e
+
                     className={cn(
                       "block px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 hover-scale",
                       isActive(item.path)

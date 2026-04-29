@@ -30,7 +30,6 @@ const PlantCare = () => {
     ]
   };
 
-<<<<<<< HEAD
   const handleImageUpload = async (file: File) => {
     setIsAnalyzing(true);
 
@@ -66,15 +65,40 @@ const PlantCare = () => {
     } finally {
       setIsAnalyzing(false);
     }
-=======
-  const handleImageUpload = () => {
     setIsAnalyzing(true);
-    // Simulate analysis
-    setTimeout(() => {
-      setAnalysisResult(sampleAnalysis);
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const res = await fetch("http://localhost:5001/analyze-plant", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      setAnalysisResult({
+        plantType: data.plantType,
+        healthScore: data.healthScore,
+        issues: data.status === "Healthy"
+          ? []
+          : [
+            {
+              name: data.status,
+              severity: "Medium",
+              description: "Detected via AI analysis"
+            }
+          ],
+        recommendations: sampleAnalysis.recommendations,
+        careSchedule: sampleAnalysis.careSchedule
+      });
+
+    } catch (err) {
+      console.error("Prediction failed", err);
+    } finally {
       setIsAnalyzing(false);
     }, 3000);
->>>>>>> 296181e207082c4565e1c682ea8f4a44d77b208e
   };
 
   const getSeverityColor = (severity: string) => {
@@ -88,11 +112,10 @@ const PlantCare = () => {
 
   return (
     <div className="min-h-screen bg-background p-4">
-<<<<<<< HEAD
       <div className="max-w-5xl mx-auto">
-=======
-      <div className="max-w-4xl mx-auto">
->>>>>>> 296181e207082c4565e1c682ea8f4a44d77b208e
+
+      <div className="max-w-5xl mx-auto">
+
         {/* Header */}
         <div className="mb-8 text-center">
           <h1 className="text-4xl font-bold mb-2 fade-in">Plant Care</h1>
@@ -113,7 +136,6 @@ const PlantCare = () => {
                   Take a clear photo of your plant for instant health analysis
                 </p>
               </div>
-<<<<<<< HEAD
 
              <div className="max-w-md mx-auto">
   <label
@@ -148,20 +170,33 @@ const PlantCare = () => {
     />
   </label>
 </div>
-=======
-              
               <div className="max-w-md mx-auto">
                 <div className="border-2 border-dashed border-border rounded-lg p-8 hover:border-primary/50 transition-colors cursor-pointer group">
                   <Upload className="h-12 w-12 text-muted-foreground group-hover:text-primary mx-auto mb-4 transition-colors" />
                   <p className="text-sm text-muted-foreground mb-4">
                     Drag and drop an image here, or click to browse
                   </p>
-                  <Button onClick={handleImageUpload} className="bg-gradient-primary">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    hidden
+                    id="plant-upload"
+                    onChange={(e) => {
+                      if (e.target.files?.[0]) {
+                        handleImageUpload(e.target.files[0]);
+                      }
+                    }}
+                  />
+
+                  <Button
+                    onClick={() => document.getElementById("plant-upload")?.click()}
+                    className="bg-gradient-primary"
+                  >
                     Choose Image
                   </Button>
                 </div>
               </div>
->>>>>>> 296181e207082c4565e1c682ea8f4a44d77b208e
+
 
               <div className="text-sm text-muted-foreground max-w-md mx-auto">
                 <p className="mb-3">💡 Tips for best results:</p>
@@ -208,15 +243,14 @@ const PlantCare = () => {
                   <p className="text-sm text-muted-foreground">Health Score</p>
                 </div>
               </div>
-<<<<<<< HEAD
 
               <Progress value={analysisResult.healthScore} className="mb-4" />
 
-=======
-              
+
+
               <Progress value={analysisResult.healthScore} className="mb-4" />
-              
->>>>>>> 296181e207082c4565e1c682ea8f4a44d77b208e
+
+
               <div className="flex items-center space-x-2">
                 {analysisResult.healthScore >= 80 ? (
                   <CheckCircle className="h-5 w-5 text-green-500" />
@@ -224,13 +258,12 @@ const PlantCare = () => {
                   <AlertCircle className="h-5 w-5 text-yellow-500" />
                 )}
                 <span className="text-sm">
-<<<<<<< HEAD
                   {analysisResult.healthScore >= 80
                     ? "Your plant is in good health!"
-=======
-                  {analysisResult.healthScore >= 80 
-                    ? "Your plant is in good health!" 
->>>>>>> 296181e207082c4565e1c682ea8f4a44d77b208e
+
+                  {analysisResult.healthScore >= 80
+                    ? "Your plant is in good health!"
+
                     : "Some issues detected - see recommendations below"
                   }
                 </span>
@@ -293,13 +326,10 @@ const PlantCare = () => {
             </Card>
 
             <div className="text-center">
-<<<<<<< HEAD
               <Button
                 onClick={() => setAnalysisResult(null)}
-=======
-              <Button 
-                onClick={() => setAnalysisResult(null)} 
->>>>>>> 296181e207082c4565e1c682ea8f4a44d77b208e
+              <Button
+                onClick={() => setAnalysisResult(null)}
                 variant="outline"
                 className="mr-4"
               >
