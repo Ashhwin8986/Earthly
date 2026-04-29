@@ -37,18 +37,11 @@ const ProfileDrawer = ({ isOpen, onClose }: ProfileDrawerProps) => {
 
   // Initialize dark mode from system preference or local storage if needed, 
   // but for now keeping it simple as requested, triggering side effect.
-  const [darkMode, setDarkMode] = useState(false);
+  const [showCredits, setShowCredits] = useState(false);
 
   const [analyticsConsent, setAnalyticsConsent] = useState(true);
 
   // Toggle dark class on html element
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [darkMode]);
 
   const getInitials = (email: string) => {
     return email.substring(0, 2).toUpperCase();
@@ -81,24 +74,20 @@ const ProfileDrawer = ({ isOpen, onClose }: ProfileDrawerProps) => {
               </Button>
             </DrawerClose>
             <DrawerTitle className="sr-only">Profile</DrawerTitle>
-
             {/* Profile Picture */}
             <div className="flex justify-center mb-4">
               <div className="h-20 w-20 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-2xl font-bold shadow-lg">
                 {getInitials(user.email || "")}
               </div>
             </div>
-
             {/* Username */}
             <h2 className="text-xl font-bold text-foreground mb-1">
               {user.email?.split('@')[0] || "User"}
             </h2>
-
             {/* Member Since */}
             <p className="text-sm text-muted-foreground mb-3">
               Member since {getMemberSince()}
             </p>
-
             {/* Bio */}
             <p className="text-sm text-foreground/80 max-w-xs mx-auto leading-relaxed">
               Passionate about environmental conservation and sustainable living.
@@ -168,7 +157,6 @@ const ProfileDrawer = ({ isOpen, onClose }: ProfileDrawerProps) => {
                 <User className="h-4 w-4 text-primary" />
                 <h3 className="font-semibold">Account Settings</h3>
               </div>
-
               <div className="space-y-3 pl-6">
                 <div>
                   <Label htmlFor="username">Username</Label>
@@ -184,68 +172,17 @@ const ProfileDrawer = ({ isOpen, onClose }: ProfileDrawerProps) => {
                     rows={2}
                   />
                 </div>
-
-                <Button variant="outline" size="sm" className="w-full">
-                  <Camera className="h-4 w-4 mr-2" />
-                  Change Profile Picture
-                </Button>
-
-                <Button variant="outline" size="sm" className="w-full">
-                  <Lock className="h-4 w-4 mr-2" />
-                  Change Password
-                </Button>
+                <Button className="w-full mt-3 bg-green-600 hover:bg-green-700 text-white">
+  Save Changes
+</Button>
               </div>
             </div>
 
             <Separator />
 
             {/* App Preferences */}
-            <div className="space-y-4">
-              <div className="flex items-center space-x-2">
-                <Settings className="h-4 w-4 text-primary" />
-                <h3 className="font-semibold">App Preferences</h3>
-              </div>
-
-              <div className="space-y-3 pl-6">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="dark-mode">Dark Mode</Label>
-                  <Switch
-                    id="dark-mode"
-                    checked={darkMode}
-                    onCheckedChange={setDarkMode}
-                  />
-                </div>
-              </div>
-            </div>
 
             <Separator />
-
-            {/* Privacy Controls */}
-            <div className="space-y-4">
-              <div className="flex items-center space-x-2">
-                <Shield className="h-4 w-4 text-primary" />
-                <h3 className="font-semibold">Privacy Controls</h3>
-              </div>
-
-              <div className="space-y-3 pl-6">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="analytics-consent">Analytics Consent</Label>
-                  <Switch
-                    id="analytics-consent"
-                    checked={analyticsConsent}
-                    onCheckedChange={setAnalyticsConsent}
-                  />
-                </div>
-
-                <Button variant="outline" size="sm" className="w-full">
-                  Manage Data Sharing
-                </Button>
-
-                <Button variant="outline" size="sm" className="w-full text-red-600 border-red-200 hover:bg-red-50">
-                  Request Data Deletion
-                </Button>
-              </div>
-            </div>
 
             <Separator />
 
@@ -257,9 +194,14 @@ const ProfileDrawer = ({ isOpen, onClose }: ProfileDrawerProps) => {
               </div>
 
               <div className="pl-6 space-y-2">
-                <Button variant="outline" size="sm" className="w-full">
-                  Developer Info & Credits
-                </Button>
+                <Button
+  variant="outline"
+  size="sm"
+  className="w-full"
+  onClick={() => setShowCredits(true)}
+>
+  Developer Info & Credits
+</Button>
 
                 <p className="text-xs text-muted-foreground text-center pt-4">
                   Version 1.3.2
@@ -268,6 +210,27 @@ const ProfileDrawer = ({ isOpen, onClose }: ProfileDrawerProps) => {
             </div>
           </div>
         </DrawerContent>
+        {showCredits && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div className="bg-white rounded-xl p-6 w-[80%] max-w-sm text-center shadow-lg">
+      
+      <h2 className="text-lg font-semibold mb-4">Developers</h2>
+
+      <p>Aastha Pokhriyal</p>
+      <p>Aditi Rawat</p>
+      <p>Ashwin Chauhan</p>
+      <p>Sarthak Jakhmola</p>
+
+      <Button
+        className="mt-4 w-full"
+        onClick={() => setShowCredits(false)}
+      >
+        Close
+      </Button>
+
+    </div>
+  </div>
+)}
       </Drawer>
     </>
   );

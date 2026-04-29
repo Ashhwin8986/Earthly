@@ -273,7 +273,8 @@ const Dashboard = () => {
         navigate("/plantcare");
         break;
       case "community":
-        break;
+  navigate("/community");
+  break;
     }
   };
 
@@ -419,7 +420,7 @@ const Dashboard = () => {
         {/* QUICK ACTIONS (unchanged) */}
         <Card className="eco-card fade-in stagger-4 hover-lift mb-6">
           <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Button variant="outline" className="justify-start hover-scale" onClick={() => handleQuickAction("air-quality")}>
               <MapPin className="h-4 w-4 mr-2" />
               Check Air Quality
@@ -431,10 +432,6 @@ const Dashboard = () => {
             <Button variant="outline" className="justify-start hover-scale" onClick={() => handleQuickAction("plant-health")}>
               <Leaf className="h-4 w-4 mr-2" />
               Analyze Plant Health
-            </Button>
-            <Button variant="outline" className="justify-start hover-scale" onClick={() => handleQuickAction("community")}>
-              <Users className="h-4 w-4 mr-2" />
-              Join Community
             </Button>
           </div>
         </Card>
