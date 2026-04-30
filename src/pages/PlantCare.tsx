@@ -65,6 +65,40 @@ const PlantCare = () => {
     } finally {
       setIsAnalyzing(false);
     }
+    setIsAnalyzing(true);
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const res = await fetch("http://localhost:5001/analyze-plant", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      setAnalysisResult({
+        plantType: data.plantType,
+        healthScore: data.healthScore,
+        issues: data.status === "Healthy"
+          ? []
+          : [
+            {
+              name: data.status,
+              severity: "Medium",
+              description: "Detected via AI analysis"
+            }
+          ],
+        recommendations: sampleAnalysis.recommendations,
+        careSchedule: sampleAnalysis.careSchedule
+      });
+
+    } catch (err) {
+      console.error("Prediction failed", err);
+    } finally {
+      setIsAnalyzing(false);
+    }, 3000);
   };
 
   const getSeverityColor = (severity: string) => {
@@ -79,6 +113,9 @@ const PlantCare = () => {
   return (
     <div className="min-h-screen bg-background p-4">
       <div className="max-w-5xl mx-auto">
+
+      <div className="max-w-5xl mx-auto">
+
         {/* Header */}
         <div className="mb-8 text-center">
           <h1 className="text-4xl font-bold mb-2 fade-in">Plant Care</h1>
@@ -100,6 +137,39 @@ const PlantCare = () => {
                 </p>
               </div>
 
+             <div className="max-w-md mx-auto">
+  <label
+    htmlFor="plant-upload"
+    className="block border-2 border-dashed border-border rounded-lg p-8 hover:border-primary/50 transition-colors cursor-pointer group"
+  >
+    <Upload className="h-12 w-12 text-muted-foreground group-hover:text-primary mx-auto mb-4 transition-colors" />
+
+    <p className="text-sm text-muted-foreground mb-4 text-center">
+      Drag and drop an image here, or click to browse
+    </p>
+
+    <div className="flex justify-center">
+      <Button
+        type="button"
+        className="bg-gradient-primary pointer-events-none"
+      >
+        Choose Image
+      </Button>
+    </div>
+
+    <input
+      id="plant-upload"
+      type="file"
+      accept="image/*"
+      className="hidden"
+      onChange={(e) => {
+        if (e.target.files?.[0]) {
+          handleImageUpload(e.target.files[0]);
+        }
+      }}
+    />
+  </label>
+</div>
               <div className="max-w-md mx-auto">
                 <div className="border-2 border-dashed border-border rounded-lg p-8 hover:border-primary/50 transition-colors cursor-pointer group">
                   <Upload className="h-12 w-12 text-muted-foreground group-hover:text-primary mx-auto mb-4 transition-colors" />
@@ -126,6 +196,7 @@ const PlantCare = () => {
                   </Button>
                 </div>
               </div>
+
 
               <div className="text-sm text-muted-foreground max-w-md mx-auto">
                 <p className="mb-3">💡 Tips for best results:</p>
@@ -175,6 +246,11 @@ const PlantCare = () => {
 
               <Progress value={analysisResult.healthScore} className="mb-4" />
 
+
+
+              <Progress value={analysisResult.healthScore} className="mb-4" />
+
+
               <div className="flex items-center space-x-2">
                 {analysisResult.healthScore >= 80 ? (
                   <CheckCircle className="h-5 w-5 text-green-500" />
@@ -184,6 +260,10 @@ const PlantCare = () => {
                 <span className="text-sm">
                   {analysisResult.healthScore >= 80
                     ? "Your plant is in good health!"
+
+                  {analysisResult.healthScore >= 80
+                    ? "Your plant is in good health!"
+
                     : "Some issues detected - see recommendations below"
                   }
                 </span>
@@ -246,6 +326,8 @@ const PlantCare = () => {
             </Card>
 
             <div className="text-center">
+              <Button
+                onClick={() => setAnalysisResult(null)}
               <Button
                 onClick={() => setAnalysisResult(null)}
                 variant="outline"

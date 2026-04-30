@@ -181,7 +181,7 @@ const FarmGuide = () => {
     formData.append("image", imageFile);
     formData.append("location", location);
 
-    const response = await fetch("http://127.0.0.1:5000/recommend", {
+    const response = await fetch("http://127.0.0.1:5001/recommend", {
       method: "POST",
       body: formData,
     });

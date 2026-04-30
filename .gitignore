@@ -25,6 +25,7 @@ dist-ssr
 ml_backend/SoilNet.h5
 
 .qoder/
-
+backend/.env
 *.h5
 *.keras
+.qoder/
