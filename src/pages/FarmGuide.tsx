@@ -47,7 +47,7 @@ const FarmGuide = () => {
   const baseYield: Record<string, number> = {
     'Rice': 26.07, 'Wheat': 33.84, 'Cotton': 4.45, 'Sugarcane': 776.09,
     'Maize': 29.55, 'Groundnut': 16.88, 'Soybean': 10.84, 'Bajra': 12.83,
-    'Jowar': 9.0, 'Gram': 10.59, 'Jute': 25.40, 'Pulses': 6.16, 'Mustard': 13.87,'Muskmelon': 120.0,
+    'Jowar': 9.0, 'Gram': 10.59, 'Jute': 25.40, 'Pulses': 6.16, 'Mustard': 13.87, 'Muskmelon': 120.0,
 
   };
 
@@ -90,7 +90,7 @@ const FarmGuide = () => {
     const formData = new FormData();
     formData.append("image", imageFile);
 
-    const response = await fetch("http://127.0.0.1:5001/predict-soil", {
+    const response = await fetch("http://127.0.0.1:5002/predict-soil", {
       method: "POST",
       body: formData
     });
@@ -99,7 +99,10 @@ const FarmGuide = () => {
       throw new Error("Soil classification failed");
     }
 
-    const data = await response.json();
+    const data = await response.json();  // ✅ ONLY ONCE
+
+    console.log("SOIL RESPONSE:", data);
+
     return {
       soilType: data.soilType,
       confidence: data.confidence
@@ -231,7 +234,6 @@ const FarmGuide = () => {
   //   }
   // };
 
-  // 🔄 UPDATED
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -245,30 +247,48 @@ const FarmGuide = () => {
     try {
       const location = localStorage.getItem("userLocation") || "Delhi";
 
-      const result = await getCropRecommendation(file, location);
+      // ✅ CALL BOTH APIs
+      const soilResult = await classifySoil(file);
+      const cropResult = await getCropRecommendation(file, location);
 
+      // ✅ SET SOIL DATA
       setSoilClassification({
-        soilType: result.soil_type,
-        confidence: 0
+        soilType: soilResult.soilType,
+        confidence: soilResult.confidence
       });
 
+      // ✅ SET CROP DATA
       setCropRecommendation({
-        recommended: result.recommended_crop,
-        alternatives: result.top_5_crops.slice(1, 3),
-        season: "",
-        rainfall: "",
-        irrigation: "",
+        recommended: cropResult.recommended_crop,
+        alternatives: cropResult.top_5_crops.slice(1, 3),
 
-        temperature: result.temperature,     // ✅ NEW
-        rainfallValue: result.rainfall       // ✅ NEW (numeric mm)
+        season: getCurrentSeason(),
+
+        rainfall: getRainfallCategory(cropResult.rainfall),
+        irrigation: getIrrigationType(cropResult.rainfall),
+
+        temperature: cropResult.temperature,
+        rainfallValue: cropResult.rainfall
       });
 
       setCurrentScreen("results");
 
     } catch (err) {
-      alert("Recommendation failed. Check backend.");
+      alert("Prediction failed. Check backend.");
       resetAll();
     }
+  };
+
+  const getRainfallCategory = (rainfall: number) => {
+    if (rainfall > 200) return "High";
+    if (rainfall > 100) return "Medium";
+    return "Low";
+  };
+
+  const getIrrigationType = (rainfall: number) => {
+    if (rainfall > 200) return "Rain-fed";
+    if (rainfall > 100) return "Supplementary Irrigation";
+    return "Full Irrigation Required";
   };
 
   // Handle yield calculation
@@ -469,7 +489,7 @@ const FarmGuide = () => {
                   {soilClassification.soilType}
                 </Badge>
                 <p className="text-sm text-muted-foreground">
-                  Confidence: {soilClassification.confidence.toFixed(1)}%
+                  Confidence: {Number(soilClassification?.confidence || 0).toFixed(1)}%
                 </p>
               </div>
               <div className="text-center">
@@ -718,9 +738,6 @@ const FarmGuide = () => {
               variant="outline"
             >
               Analyze Another Field
-            </Button>
-            <Button className="bg-gradient-primary">
-              Save Report
             </Button>
           </div>
         </div>
