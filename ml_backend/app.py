@@ -9,7 +9,8 @@ app = Flask(__name__)
 CORS(app)
 
 # Load model once
-model = load_model("SoilNet.h5")
+
+model = load_model("SoilNet.h5", compile=False)
 
 # IMPORTANT: class mapping (adjust order if needed)
 CLASS_NAMES = [

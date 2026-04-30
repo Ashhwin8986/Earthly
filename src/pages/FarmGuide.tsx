@@ -47,7 +47,7 @@ const FarmGuide = () => {
   const baseYield: Record<string, number> = {
     'Rice': 26.07, 'Wheat': 33.84, 'Cotton': 4.45, 'Sugarcane': 776.09,
     'Maize': 29.55, 'Groundnut': 16.88, 'Soybean': 10.84, 'Bajra': 12.83,
-    'Jowar': 9.0, 'Gram': 10.59, 'Jute': 25.40, 'Pulses': 6.16, 'Mustard': 13.87
+    'Jowar': 9.0, 'Gram': 10.59, 'Jute': 25.40, 'Pulses': 6.16, 'Mustard': 13.87,'Muskmelon': 120.0,
 
   };
 

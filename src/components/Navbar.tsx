@@ -41,7 +41,6 @@ const navItems = [
   { name: "Air Map", path: "/airmap", requiresLocation: true },
   { name: "Grow Guide", path: "/growguide" },
   { name: "Plant Care", path: "/plantcare" },
-  { name: "Trash Scan", path: "/trashscan" },
   { name: "FarmGuide", path: "/farmguide" },
   { name: "Earth Feed", path: "/earthfeed" },
 ];
