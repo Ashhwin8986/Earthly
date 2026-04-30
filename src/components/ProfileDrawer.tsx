@@ -216,8 +216,8 @@ const ProfileDrawer = ({ isOpen, onClose }: ProfileDrawerProps) => {
       
       <h2 className="text-lg font-semibold mb-4">Developers</h2>
 
-      <p>Aastha Pokhriyal</p>
       <p>Aditi Rawat</p>
+      <p>Aastha Pokhriyal</p>
       <p>Ashwin Chauhan</p>
       <p>Sarthak Jakhmola</p>
 

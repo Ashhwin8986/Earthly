@@ -22,10 +22,6 @@ interface CropRecommendation {
   irrigation: string;
   temperature?: number;
   rainfallValue?: number;
-
-  temperature?: number;
-  rainfallValue?: number;
-
 }
 
 interface YieldResult {
@@ -51,7 +47,7 @@ const FarmGuide = () => {
   const baseYield: Record<string, number> = {
     'Rice': 26.07, 'Wheat': 33.84, 'Cotton': 4.45, 'Sugarcane': 776.09,
     'Maize': 29.55, 'Groundnut': 16.88, 'Soybean': 10.84, 'Bajra': 12.83,
-    'Jowar': 9.0, 'Gram': 10.59, 'Jute': 25.40, 'Pulses': 6.16, 'Mustard': 13.87
+    'Jowar': 9.0, 'Gram': 10.59, 'Jute': 25.40, 'Pulses': 6.16, 'Mustard': 13.87,'Muskmelon': 120.0,
 
   };
 
@@ -91,10 +87,6 @@ const FarmGuide = () => {
   };
 
   const classifySoil = async (imageFile: File): Promise<SoilClassification> => {
-
-
-  const classifySoil = async (imageFile: File): Promise<SoilClassification> => {
-
     const formData = new FormData();
     formData.append("image", imageFile);
 
@@ -116,9 +108,6 @@ const FarmGuide = () => {
 
 
   // 🔄 UPDATED HYBRID MODEL
-
-  // 🔄 UPDATED HYBRID MODEL
-
   const calculateYield = (
     crop: string,
     soilType: string,
@@ -143,25 +132,6 @@ const FarmGuide = () => {
     } else {
       areaHectares = 0;
     }
-
-    rainfallCategory: string,   // still used for UI
-    rainfallValue: number,      // actual mm
-    temperature: number
-  ): YieldResult => {
-
-    // ✅ FIXED: Proper area conversion
-    let areaHectares;
-
-    if (unit === "meters") {
-      areaHectares = (length * width) / 10000; // m² → hectares
-    } else if (unit === "feet") {
-      areaHectares = (length * width) / 107639; // ft² → hectares
-    } else if (unit === "acres") {
-      areaHectares = length * 0.4047; // ✅ acres → hectares
-    } else {
-      areaHectares = 0;
-    }
-
 
     const base = baseYield[crop] ?? 20;
     const soilAdj = soilFactor[soilType] ?? 1.0;
@@ -196,26 +166,6 @@ const FarmGuide = () => {
       temperature
     });
 
-
-    // ✅ Continuous rainfall factor
-    const rainAdj = 1 + (rainfallValue / 300);
-
-    // ✅ Temperature factor
-    let tempAdj = 1.0;
-    if (temperature < 15) tempAdj = 0.8;
-    else if (temperature < 25) tempAdj = 1.0;
-    else if (temperature < 35) tempAdj = 1.1;
-    else tempAdj = 0.9;
-
-    // ✅ Final yield formula
-    const yieldPerHectare = Math.min(
-      base * soilAdj * irrAdj * rainAdj * tempAdj,
-      base * 1.8
-    );
-
-    const totalYield = yieldPerHectare * areaHectares;
-
-
     return {
       areaHectares,
       areaAcres: areaHectares * 2.471,
@@ -231,7 +181,7 @@ const FarmGuide = () => {
     formData.append("image", imageFile);
     formData.append("location", location);
 
-    const response = await fetch("http://127.0.0.1:5000/recommend", {
+    const response = await fetch("http://127.0.0.1:5001/recommend", {
       method: "POST",
       body: formData,
     });
@@ -282,7 +232,6 @@ const FarmGuide = () => {
   // };
 
   // 🔄 UPDATED
-
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -318,30 +267,6 @@ const FarmGuide = () => {
 
     } catch (err) {
       alert("Recommendation failed. Check backend.");
-
-      const result = await getCropRecommendation(file, location);
-
-      setSoilClassification({
-        soilType: result.soil_type,
-        confidence: 0
-      });
-
-      setCropRecommendation({
-        recommended: result.recommended_crop,
-        alternatives: result.top_5_crops.slice(1, 3),
-        season: "",
-        rainfall: "",
-        irrigation: "",
-
-        temperature: result.temperature,     // ✅ NEW
-        rainfallValue: result.rainfall       // ✅ NEW (numeric mm)
-      });
-
-      setCurrentScreen("results");
-
-    } catch (err) {
-      alert("Soil classification failed. Please try another image.");
-
       resetAll();
     }
   };
@@ -394,31 +319,6 @@ const FarmGuide = () => {
     );
   };
 
-  const handleYieldCalculation = ({
-    length,
-    width
-  }: {
-    length: string;
-    width: string;
-  }) => {
-    if (!cropRecommendation || !soilClassification) return;
-
-    setYieldResult(
-      calculateYield(
-        cropRecommendation.recommended,
-        soilClassification.soilType,
-        parseFloat(length),
-        parseFloat(width),
-        unit,
-        cropRecommendation.irrigation,
-        cropRecommendation.rainfall,
-        cropRecommendation.rainfallValue ?? 0,   // ✅ NEW
-        cropRecommendation.temperature ?? 25     // ✅ NEW
-      )
-    );
-  };
-
-
 
   const getSoilColor = (soilType: string) => {
     switch (soilType) {
@@ -444,9 +344,6 @@ const FarmGuide = () => {
     return (
       <div className="min-h-screen bg-background p-4">
         <div className="max-w-5xl mx-auto">
-
-        <div className="max-w-5xl mx-auto">
-
           <div className="mb-8 text-center">
             <h1 className="text-4xl font-bold mb-2 fade-in">Farm Guide</h1>
             <p className="text-xl text-muted-foreground fade-in stagger-1">
@@ -466,35 +363,6 @@ const FarmGuide = () => {
                 </p>
               </div>
 
-              <div className="max-w-md mx-auto">
-  <label
-    htmlFor="image-upload"
-    className="border-2 border-dashed border-border rounded-lg p-8 hover:border-primary/50 transition-colors cursor-pointer group block"
-  >
-    <Upload className="h-12 w-12 text-muted-foreground group-hover:text-primary mx-auto mb-4 transition-colors" />
-
-    <p className="text-sm text-muted-foreground mb-4 text-center">
-      Drag and drop an image here, or click to browse
-    </p>
-
-    <div className="flex justify-center">
-      <Button
-        type="button"
-        className="bg-gradient-primary pointer-events-none"
-      >
-        Choose Image
-      </Button>
-    </div>
-
-    <input
-      id="image-upload"
-      type="file"
-      accept="image/*"
-      onChange={handleImageUpload}
-      className="hidden"
-    />
-  </label>
-</div>
               <div className="max-w-md mx-auto">
                 <label htmlFor="image-upload" className="block">
                   <div className="border-2 border-dashed border-border rounded-lg p-8 hover:border-primary/50 transition-colors cursor-pointer group">
@@ -516,7 +384,6 @@ const FarmGuide = () => {
                 </label>
               </div>
 
-
               <div className="text-sm text-muted-foreground max-w-md mx-auto">
                 <p className="mb-3">💡 Tips for best results:</p>
                 <div className="space-y-2 text-center">
@@ -537,9 +404,6 @@ const FarmGuide = () => {
     return (
       <div className="min-h-screen bg-background p-4">
         <div className="max-w-5xl mx-auto">
-
-        <div className="max-w-5xl mx-auto">
-
           <div className="mb-8 text-center">
             <h1 className="text-4xl font-bold mb-2">Farm Guide</h1>
           </div>
@@ -574,12 +438,6 @@ const FarmGuide = () => {
         <div className="mb-8">
           <Button
             variant="ghost"
-
-      <div className="max-w-5xl mx-auto">
-        <div className="mb-8">
-          <Button
-            variant="ghost"
-
             onClick={resetAll}
             className="mb-4"
           >
@@ -602,11 +460,6 @@ const FarmGuide = () => {
                 <img
                   src={uploadedImage}
                   alt="Uploaded soil"
-
-                <img
-                  src={uploadedImage}
-                  alt="Uploaded soil"
-
                   className="w-32 h-32 object-cover rounded-lg"
                 />
               )}
@@ -634,7 +487,6 @@ const FarmGuide = () => {
               <Sprout className="h-5 w-5 mr-2 text-green-500" />
               Recommended Crop for Your Field
             </h3>
-
 
             <div className="p-8 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg text-center mb-6">
               <Leaf className="h-16 w-16 text-green-600 mx-auto mb-4" />
@@ -698,9 +550,6 @@ const FarmGuide = () => {
                   Calculate estimated crop yield and income for your land
                 </p>
                 <Button
-
-                <Button
-
                   onClick={() => setShowYieldCalculator(true)}
                   className="bg-gradient-primary"
                 >
@@ -741,17 +590,6 @@ const FarmGuide = () => {
                         step="0.01"
                         placeholder="100"
                         required
-                  <div className="grid md:grid-cols-3 gap-4">
-                    <div>
-                      <Label htmlFor="length">Length</Label>
-                      <Input
-                        id="length"
-                        name="length"
-                        type="number"
-                        step="0.01"
-                        placeholder="100" 
-                        required 
-
                       />
                     </div>
 
@@ -764,13 +602,6 @@ const FarmGuide = () => {
                         step="0.01"
                         placeholder="80"
                         required
-                        id="width"
-                        name="width"
-                        type="number"
-                        step="0.01"
-                        placeholder="80" 
-                        required 
-
                       />
                     </div>
 
@@ -780,7 +611,6 @@ const FarmGuide = () => {
                         value={unit}
                         onValueChange={(value) => setUnit(value)}
                       >
-
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
@@ -797,11 +627,6 @@ const FarmGuide = () => {
                     <Button
                       type="button"
                       variant="outline"
-
-                    <Button
-                      type="button"
-                      variant="outline"
-
                       onClick={() => setShowYieldCalculator(false)}
                       className="flex-1"
                     >
@@ -823,7 +648,6 @@ const FarmGuide = () => {
                 <TrendingUp className="h-5 w-5 mr-2 text-blue-500" />
                 Yield Prediction for {cropRecommendation.recommended}
               </h3>
-
 
               <div className="grid md:grid-cols-3 gap-4 mb-6">
                 <div className="p-4 bg-secondary rounded-lg text-center">
@@ -869,18 +693,12 @@ const FarmGuide = () => {
               <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
                 <p className="text-sm text-yellow-800 dark:text-yellow-200">
                   ⚠️ Note: These are estimated values based on standard agricultural data.
-
-                  ⚠️ Note: These are estimated values based on standard agricultural data.
-
                   Actual yield may vary based on farming practices, weather conditions, and pest management.
                 </p>
               </div>
 
               <div className="mt-4 text-center">
                 <Button
-
-                <Button
-
                   variant="outline"
                   onClick={() => {
                     setYieldResult(null);
@@ -897,10 +715,6 @@ const FarmGuide = () => {
           <div className="text-center space-x-4 pb-8">
             <Button
               onClick={resetAll}
-
-            <Button
-              onClick={resetAll}
-
               variant="outline"
             >
               Analyze Another Field

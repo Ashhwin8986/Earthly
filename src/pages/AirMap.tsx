@@ -1,9 +1,5 @@
 import { useEffect, useState, useRef } from "react";
 import { MapPin, Wind, Thermometer, Droplets, Eye, X, Cloud } from "lucide-react";
-
-import { useEffect, useState, useRef } from "react";
-import { MapPin, Wind, Thermometer, Droplets, Eye, X, Cloud } from "lucide-react";
-
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -24,7 +20,6 @@ type NearbyLocation = {
   }>;
 };
 
-
 const AirMap = () => {
   const [params] = useSearchParams();
 
@@ -44,18 +39,6 @@ const AirMap = () => {
   const pollutionMapContainerRef = useRef<HTMLDivElement>(null);
   const heatMapInstance = useRef<L.Map | null>(null);
   const pollutionMapInstance = useRef<L.Map | null>(null);
-=======
-  const [error, setError] = useState("");
-  const [showHeatMap, setShowHeatMap] = useState(false);
-  const [showPollutionMap, setShowPollutionMap] = useState(false);
-  const [heatMapData, setHeatMapData] = useState<any>(null);
-  const [pollutionMapData, setPollutionMapData] = useState<any>(null);
-  const [healthRecommendations, setHealthRecommendations] = useState<string[]>([]);
-  const heatMapContainerRef = useRef<HTMLDivElement>(null);
-  const pollutionMapContainerRef = useRef<HTMLDivElement>(null);
-  const heatMapInstance = useRef<L.Map | null>(null);
-  const pollutionMapInstance = useRef<L.Map | null>(null);
-
 
   const getAQIColor = (aqi: number) => {
     if (aqi <= 50) return "bg-green-500";
@@ -64,11 +47,6 @@ const AirMap = () => {
     if (aqi <= 200) return "bg-red-500";
     if (aqi <= 300) return "bg-purple-500";
     return "bg-red-900";
-
-    if (aqi <= 200) return "bg-red-500";
-    if (aqi <= 300) return "bg-purple-500";
-    return "bg-red-900";
-
   };
 
   const getAQILevel = (aqi: number) => {
@@ -187,7 +165,6 @@ const AirMap = () => {
     } catch (err: any) {
       setError(err.message || "Something went wrong");
     }
-
   };
 
   useEffect(() => {
@@ -341,76 +318,6 @@ const AirMap = () => {
     };
   }, [showPollutionMap, pollutionMapData, lat, lon, airQualityData]);
 
-  // Initialize Heat Map with Leaflet
-  useEffect(() => {
-    if (!showHeatMap || !heatMapContainerRef.current || !lat || !lon) return;
-
-    const centerLat = parseFloat(lat);
-    const centerLon = parseFloat(lon);
-
-    // Generate mock nearby points for heatmap density
-    const generateHeatmapPoints = () => {
-      const points = [];
-      // Generate 50 points around the center with slight variations
-      for (let i = 0; i < 50; i++) {
-        const latOffset = (Math.random() - 0.5) * 0.05; // ~2.5km variation
-        const lonOffset = (Math.random() - 0.5) * 0.05;
-        const intensity = Math.random(); // 0-1 intensity
-        
-        points.push([
-          centerLat + latOffset,
-          centerLon + lonOffset,
-          intensity
-        ]);
-      }
-      return points;
-    };
-
-    if (heatMapInstance.current) {
-      heatMapInstance.current.remove();
-    }
-
-    heatMapInstance.current = L.map(heatMapContainerRef.current).setView([centerLat, centerLon], 12);
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors'
-    }).addTo(heatMapInstance.current);
-
-    // Add heatmap layer
-    const heatPoints = generateHeatmapPoints();
-    const heat = (L as any).heatLayer(heatPoints, {
-      radius: 25,
-      blur: 15,
-      maxZoom: 17,
-      gradient: {
-        0.0: 'blue',
-        0.3: 'cyan',
-        0.6: 'yellow',
-        0.8: 'orange',
-        1.0: 'red'
-      }
-    }).addTo(heatMapInstance.current);
-
-    // Add marker for current location
-    L.marker([centerLat, centerLon])
-      .bindPopup('<h3>Current Location</h3>')
-      .addTo(heatMapInstance.current);
-
-    return () => {
-      if (heatMapInstance.current) {
-        heatMapInstance.current.remove();
-        heatMapInstance.current = null;
-      }
-    };
-  }, [showHeatMap, heatMapData, lat, lon]);
-
-  // Initialize Pollution Map with Leaflet
-  useEffect(() => {
-    if (!showPollutionMap || !pollutionMapContainerRef.current || !lat || !lon) return;
-
-  // ---------------- UI: No changes below this line ----------------
-
-
   return (
     <div className="min-h-screen bg-background p-4">
       <div className="max-w-7xl mx-auto">
@@ -434,11 +341,6 @@ const AirMap = () => {
                   Temperature distribution and heat index overlay for {place}.
                 </p>
                 <Button className="bg-gradient-primary hover-scale" onClick={fetchHeatMap}>View Heat Map</Button>
-
-                  Temperature distribution and heat index overlay for {place}.
-                </p>
-                <Button className="bg-gradient-primary hover-scale" onClick={fetchHeatMap}>View Heat Map</Button>
-
               </div>
             </Card>
 
@@ -450,11 +352,6 @@ const AirMap = () => {
                   Air pollution levels and contamination zones for {place}.
                 </p>
                 <Button className="bg-gradient-primary hover-scale" onClick={fetchPollutionMap}>View Pollution Map</Button>
-
-                  Air pollution levels and contamination zones for {place}.
-                </p>
-                <Button className="bg-gradient-primary hover-scale" onClick={fetchPollutionMap}>View Pollution Map</Button>
-
               </div>
             </Card>
 
@@ -470,7 +367,6 @@ const AirMap = () => {
                     <p>Loading recommendations...</p>
                   </>
                 )}
-
               </div>
             </Card>
           </div>
@@ -665,109 +561,6 @@ const AirMap = () => {
             </Card>
           </div>
         )}
-
-
-                {heatMapData && (
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 bg-secondary rounded-lg">
-                      <div className="text-sm text-muted-foreground">Current Temperature</div>
-                      <div className="text-3xl font-bold text-primary">{heatMapData.current_temp}°C</div>
-                    </div>
-                    <div className="p-4 bg-secondary rounded-lg">
-                      <div className="text-sm text-muted-foreground">Feels Like</div>
-                      <div className="text-3xl font-bold text-accent">{heatMapData.feels_like}°C</div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </Card>
-          </div>
-        )}
-
-        {/* Pollution Map Modal */}
-        {showPollutionMap && (
-          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowPollutionMap(false)}>
-            <Card className="eco-card max-w-4xl w-full max-h-[90vh] overflow-auto" onClick={(e) => e.stopPropagation()}>
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-semibold">Pollution Map - {place}</h3>
-                <Button variant="ghost" size="sm" onClick={() => setShowPollutionMap(false)}>
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-              
-              <div className="space-y-4">
-                {/* Mapbox Pollution Map */}
-                <div 
-                  ref={pollutionMapContainerRef} 
-                  className="w-full h-96 rounded-lg overflow-hidden"
-                />
-                
-                {/* AQI Legend */}
-                <div className="grid grid-cols-5 gap-2 text-center text-xs">
-                  <div className="p-2 bg-green-500 text-white rounded">
-                    <div className="font-bold">0-50</div>
-                    <div>Good</div>
-                  </div>
-                  <div className="p-2 bg-yellow-500 text-white rounded">
-                    <div className="font-bold">51-100</div>
-                    <div>Moderate</div>
-                  </div>
-                  <div className="p-2 bg-orange-500 text-white rounded">
-                    <div className="font-bold">101-150</div>
-                    <div>Unhealthy (Sensitive)</div>
-                  </div>
-                  <div className="p-2 bg-red-500 text-white rounded">
-                    <div className="font-bold">151-200</div>
-                    <div>Unhealthy</div>
-                  </div>
-                  <div className="p-2 bg-purple-500 text-white rounded">
-                    <div className="font-bold">201+</div>
-                    <div>Very Unhealthy</div>
-                  </div>
-                </div>
-
-                {pollutionMapData && (
-                  <>
-                    <div className="grid grid-cols-3 gap-4">
-                      <div className="p-4 bg-secondary rounded-lg">
-                        <div className="text-sm text-muted-foreground">AQI</div>
-                        <div className="text-2xl font-bold">{pollutionMapData.aqi}</div>
-                        <div className={`text-xs px-2 py-1 rounded text-white mt-1 inline-block ${getAQIColor(pollutionMapData.aqi)}`}>
-                          {getAQILevel(pollutionMapData.aqi)}
-                        </div>
-                      </div>
-                      <div className="p-4 bg-secondary rounded-lg">
-                        <div className="text-sm text-muted-foreground">PM2.5</div>
-                        <div className="text-2xl font-bold">{pollutionMapData.pm25}</div>
-                        <div className="text-xs text-muted-foreground">µg/m³</div>
-                      </div>
-                      <div className="p-4 bg-secondary rounded-lg">
-                        <div className="text-sm text-muted-foreground">PM10</div>
-                        <div className="text-2xl font-bold">{pollutionMapData.pm10}</div>
-                        <div className="text-xs text-muted-foreground">µg/m³</div>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-4">
-                      <div className="p-3 bg-secondary rounded-lg">
-                        <div className="text-sm text-muted-foreground">CO</div>
-                        <div className="text-xl font-bold">{pollutionMapData.co}</div>
-                      </div>
-                      <div className="p-3 bg-secondary rounded-lg">
-                        <div className="text-sm text-muted-foreground">NO₂</div>
-                        <div className="text-xl font-bold">{pollutionMapData.no2}</div>
-                      </div>
-                      <div className="p-3 bg-secondary rounded-lg">
-                        <div className="text-sm text-muted-foreground">SO₂</div>
-                        <div className="text-xl font-bold">{pollutionMapData.so2}</div>
-                      </div>
-                    </div>
-                  </>
-                )}
-              </div>
-            </Card>
-          </div>
-        </div>
 
       </div>
     </div>

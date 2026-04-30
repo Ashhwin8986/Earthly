@@ -1,8 +1,5 @@
 import { useState } from "react";
-import { Calendar, Lightbulb } from "lucide-react";
-
-import { useState } from "react";
-import { Calendar, Sprout, Droplets, Lightbulb } from "lucide-react";
+import { Calendar, Lightbulb, Sprout, Droplets } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -27,7 +24,7 @@ interface Crop {
 
 const GrowGuide = () => {
   const navigate = useNavigate();
-  const [selectedMonth, setSelectedMonth] = useState(2); // default March
+  const [selectedMonth, setSelectedMonth] = useState(2);
 
   const months = [
     "January","February","March","April","May","June",
@@ -114,9 +111,7 @@ const GrowGuide = () => {
           </p>
         </div>
 
-        {/* MONTH SELECTOR */}
-        <Card className="eco-card mb-8">
-        {/* Month Selector */}
+        {/* ✅ FIXED: SINGLE CARD ONLY */}
         <Card className="eco-card mb-8 fade-in stagger-3 hover-lift">
 
           <div className="flex items-center space-x-4 mb-4">
@@ -137,6 +132,7 @@ const GrowGuide = () => {
               </Button>
             ))}
           </div>
+
         </Card>
 
         {/* CROPS */}
@@ -152,14 +148,10 @@ const GrowGuide = () => {
           <div>Loading...</div>
         ) : (
           <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {crops.map((crop: Crop, index) => (
-              <Card
-                key={crop.id}
-                className="eco-card hover-lift flex flex-col h-full"
-              >
+            {crops.map((crop: Crop) => (
+              <Card key={crop.id} className="eco-card hover-lift flex flex-col h-full">
                 <div className="flex flex-col h-full justify-between">
 
-                  {/* TOP */}
                   <div className="space-y-4">
 
                     <div className="flex items-start space-x-3">
@@ -184,7 +176,6 @@ const GrowGuide = () => {
                       </div>
                     </div>
 
-                    {/* DETAILS */}
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Sowing:</span>
@@ -228,9 +219,9 @@ const GrowGuide = () => {
                         </p>
                       </div>
                     )}
+
                   </div>
 
-                  {/* BUTTON */}
                   <Button
                     className="w-full mt-4"
                     variant="outline"
