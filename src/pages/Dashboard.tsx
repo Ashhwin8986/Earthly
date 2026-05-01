@@ -33,9 +33,9 @@ const Dashboard = () => {
   const [username, setUsername] = useState<string>("User");
   const [memberSince, setMemberSince] = useState<string>("Recently");
 
-  // -----------------------------
+
   // STATE (persistent via localStorage)
-  // -----------------------------
+
   const [showLocationInput, setShowLocationInput] = useState(false);
 
   const [userLocation, setUserLocation] = useState(
@@ -98,9 +98,9 @@ const Dashboard = () => {
     return () => el.removeEventListener("wheel", onWheel);
   }, []);
 
-  // -----------------------------
+  
   // LOCATION SEARCH + FORECAST
-  // -----------------------------
+
   const handleLocationEdit = () => setShowLocationInput((v) => !v);
 
   const searchLocation = async () => {
@@ -163,13 +163,6 @@ const Dashboard = () => {
         userLocation
       )}`
     );
-  };
-
-  // -----------------------------
-  // User statistics
-  // -----------------------------
-  const userStats = {
-    plantsGrown: 23,
   };
 
   // Fetch user profile data from Supabase
@@ -278,9 +271,8 @@ const Dashboard = () => {
     }
   };
 
-  // ============================================================
-  // UI (all your previous content kept exactly as it was)
-  // ============================================================
+
+
 
   return (
     <div className="min-h-screen bg-background p-4 pb-20">
@@ -312,45 +304,41 @@ const Dashboard = () => {
 
                 {/* LOCATION */}
                 <div className="space-y-2">
+                <span className="text-sm text-muted-foreground">
+                 Your Location
+                </span>
 
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">
-                      Your Location
-                    </span>
+                {showLocationInput ? (
+    <div className="flex flex-wrap gap-2">
+      <input
+        value={searchText}
+        onChange={(e) => setSearchText(e.target.value)}
+        placeholder="Search city..."
+        className="input input-sm border px-2 py-1 rounded flex-1 min-w-[150px]"
+      />
 
-                    {showLocationInput ? (
-                      <div className="flex space-x-2">
-                        <input
-                          value={searchText}
-                          onChange={(e) => setSearchText(e.target.value)}
-                          placeholder="Search city..."
-                          className="input input-sm border px-2 py-1 rounded"
-                        />
+      <Button size="sm" onClick={searchLocation} disabled={loading}>
+        Search
+      </Button>
 
-                        <Button size="sm" onClick={searchLocation} disabled={loading}>
-                          Search
-                        </Button>
-
-                        <Button size="sm" variant="ghost" onClick={handleLocationEdit}>
-                          Cancel
-                        </Button>
-                      </div>
-                    ) : (
-                      <div className="flex items-center space-x-2">
-                        <span className="text-sm font-medium">{userLocation}</span>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={handleLocationEdit}
-                          className="p-1 h-6 w-6"
-                        >
-                          <Edit className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
+      <Button size="sm" variant="ghost" onClick={handleLocationEdit}>
+        Cancel
+      </Button>
+    </div>
+  ) : (
+    <div className="flex items-center space-x-2">
+      <span className="text-sm font-medium">{userLocation}</span>
+      <Button
+        size="sm"
+        variant="ghost"
+        onClick={handleLocationEdit}
+        className="p-1 h-6 w-6"
+      >
+        <Edit className="h-3 w-3" />
+      </Button>
+    </div>
+  )}
+</div>
                 {error && (
                   <p className="text-red-600 text-sm mt-2">{error}</p>
                 )}
