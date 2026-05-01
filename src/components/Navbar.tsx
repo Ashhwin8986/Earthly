@@ -82,7 +82,7 @@ const navItems = [
             : "bg-background border-b border-border/20"
         )}
       >
-        <div className="max-w-5xl mx-auto px-4 md:px-0">
+        {/* <div className="max-w-5xl mx-auto px-4 md:px-0"> */}
 
         <div className="max-w-5xl mx-auto px-4 md:px-0">
 
@@ -125,30 +125,25 @@ const navItems = [
             </Link>
 
             {/* Desktop Navigation */}
-            {!isLandingPage && (
-              <div className="hidden md:flex items-center space-x-1">
-                {navItems.map((item) => (
-                  <Link
-                    key={item.name}
-                    to={item.path}
-                    onClick={(e) => handleNavClick(e, item)}
-                    className={cn(
-                      "px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200 hover-scale",
-
-                    onClick={(e) => handleNavClick(e, item)}
-                    className={cn(
-                      "px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200 hover-scale",
-
-                      isActive(item.path)
-                        ? "bg-primary text-primary-foreground shadow-sm"
-                        : "text-foreground hover:bg-secondary hover:text-secondary-foreground"
-                    )}
-                  >
-                    {item.name}
-                  </Link>
-                ))}
-              </div>
-            )}
+             {!isLandingPage && (
+               <div className="hidden md:flex items-center space-x-1">
+               {navItems.map((item) => (
+      <Link
+        key={item.name}
+        to={item.path}
+        onClick={(e) => handleNavClick(e, item)}
+        className={cn(
+          "px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200 hover-scale",
+          isActive(item.path)
+            ? "bg-primary text-primary-foreground shadow-sm"
+            : "text-foreground hover:bg-secondary hover:text-secondary-foreground"
+        )}
+      >
+        {item.name}
+      </Link>
+    ))}
+  </div>
+)}
 
             {/* Auth Section */}
             <div className="hidden md:flex items-center space-x-4">
