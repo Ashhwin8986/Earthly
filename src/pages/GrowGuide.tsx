@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Calendar, Lightbulb } from "lucide-react";
+import { Calendar, Lightbulb, Sprout, Droplets } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -48,29 +48,49 @@ const GrowGuide = () => {
     navigate('/cropdetails', { state: { crop } });
   };
 
+  // ✅ IMPROVED ICON SYSTEM
   const getCropIcon = (name: string) => {
     const n = name.toLowerCase();
 
-    const iconMap = [
+    const iconMap: { pattern: RegExp; icon: string }[] = [
+      // 🌿 Leafy greens
       { pattern: /(amaranth|spinach|lettuce|cabbage|fenugreek|coriander|mustard)/, icon: "🥬" },
+
+      // 🥕 Roots
       { pattern: /(carrot)/, icon: "🥕" },
       { pattern: /(beetroot)/, icon: "🟣" },
       { pattern: /(turnip)/, icon: "⚪" },
       { pattern: /(radish)/, icon: "🌱" },
+
+      // 🧅 Bulbs
       { pattern: /(onion)/, icon: "🧅" },
       { pattern: /(garlic)/, icon: "🧄" },
+
+      // 🍅 Fruiting veggies
       { pattern: /(tomato)/, icon: "🍅" },
       { pattern: /(brinjal|eggplant)/, icon: "🍆" },
       { pattern: /(chili|pepper)/, icon: "🌶️" },
       { pattern: /(lady finger|okra)/, icon: "🌿" },
+
+      // 🥒 Gourds (FIXED)
       { pattern: /(bottle gourd|sponge gourd|ridge gourd|snake gourd|bitter gourd)/, icon: "🥒" },
+
+      // 🍉 Fruits
       { pattern: /(watermelon|muskmelon)/, icon: "🍉" },
+
+      // 🌽 Cereals
       { pattern: /(maize|corn)/, icon: "🌽" },
       { pattern: /(rice)/, icon: "🍚" },
       { pattern: /(sorghum|jowar)/, icon: "🌾" },
       { pattern: /(millet|bajra)/, icon: "🌾" },
+
+      // 🫘 Pulses
       { pattern: /(chickpea|gram|moong|urad|pigeon pea|arhar|lentil)/, icon: "🫘" },
+
+      // 🫛 Beans (specific)
       { pattern: /(french beans|cluster beans|yardlong beans|cowpea)/, icon: "🫛" },
+
+      // 🌿 Tubers & spices
       { pattern: /(turmeric)/, icon: "🟠" },
       { pattern: /(sweet potato)/, icon: "🍠" },
     ];
@@ -183,12 +203,14 @@ const GrowGuide = () => {
                       </div>
                     </div>
 
+                    {/* DESCRIPTION */}
                     <div className="pt-3 border-t border-border">
                       <p className="text-sm text-muted-foreground line-clamp-3">
                         💡 {crop.description}
                       </p>
                     </div>
 
+                    {/* TIP */}
                     {crop.tip && (
                       <div className="pt-2 border-t border-border flex items-start space-x-2">
                         <Lightbulb className="h-4 w-4 text-yellow-500 mt-0.5" />
@@ -213,7 +235,6 @@ const GrowGuide = () => {
             ))}
           </div>
         )}
-
       </div>
     </div>
   );
