@@ -183,14 +183,27 @@ const AirMap = () => {
     const centerLat = parseFloat(lat);
     const centerLon = parseFloat(lon);
 
-    // Generate mock nearby points for heatmap density
+    // Generate heatmap points based on actual temperature data from API
     const generateHeatmapPoints = () => {
       const points = [];
-      // Generate 50 points around the center with slight variations
+      
+      // Use actual temperature from API if available
+      const baseTemp = heatMapData?.current_temp || 30; // Default to 30°C if not available
+      
+      // Generate 50 points around the center with temperature-based intensity
       for (let i = 0; i < 50; i++) {
         const latOffset = (Math.random() - 0.5) * 0.05; // ~2.5km variation
         const lonOffset = (Math.random() - 0.5) * 0.05;
-        const intensity = Math.random(); // 0-1 intensity
+        
+        // Simulate temperature variation: points closer to center = closer to baseTemp
+        const distanceFactor = Math.sqrt(latOffset * latOffset + lonOffset * lonOffset) / 0.025;
+        const tempVariation = (Math.random() - 0.5) * 8 * distanceFactor; // ±4°C variation
+        const pointTemp = baseTemp + tempVariation;
+        
+        // Normalize temperature to 0-1 intensity scale
+        // Range: 0°C (intensity 0) to 50°C (intensity 1)
+        // 36°C should give intensity ~0.72 (orange-red range)
+        const intensity = Math.max(0, Math.min(1, pointTemp / 50));
         
         points.push([
           centerLat + latOffset,
@@ -218,11 +231,12 @@ const AirMap = () => {
       blur: 15,
       maxZoom: 17,
       gradient: {
-        0.0: 'blue',
-        0.3: 'cyan',
-        0.6: 'yellow',
-        0.8: 'orange',
-        1.0: 'red'
+        0.0: 'orange',    // Base color - Hot
+        0.3: 'darkorange',
+        0.5: 'orangered',
+        0.7: 'red',
+        0.85: 'darkred',
+        1.0: 'crimson'    // Maximum intensity
       }
     }).addTo(heatMapInstance.current);
 
@@ -449,15 +463,14 @@ const AirMap = () => {
                 
                 {/* Legend */}
                 <div className="flex items-center justify-between text-sm">
-                  <span>Low Pollution</span>
+                  <span>Hot</span>
                   <div className="flex items-center space-x-1">
-                    <div className="w-8 h-3 bg-blue-500 rounded"></div>
-                    <div className="w-8 h-3 bg-cyan-400 rounded"></div>
-                    <div className="w-8 h-3 bg-yellow-400 rounded"></div>
-                    <div className="w-8 h-3 bg-orange-500 rounded"></div>
-                    <div className="w-8 h-3 bg-red-500 rounded"></div>
+                    <div className="w-6 h-3 bg-orange-500 rounded"></div>
+                    <div className="w-6 h-3 bg-red-500 rounded"></div>
+                    <div className="w-6 h-3 bg-red-700 rounded"></div>
+                    <div className="w-6 h-3 bg-red-900 rounded"></div>
                   </div>
-                  <span>High Pollution</span>
+                  <span>Extreme Heat</span>
                 </div>
 
                 {heatMapData && (
